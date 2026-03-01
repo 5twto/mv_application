@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mindvalley Retention Intelligence Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --mv-orange: #E85D26;
+    --mv-orange-light: #FF7A45;
+    --mv-orange-dim: rgba(232,93,38,0.12);
+    --sidebar-bg: #0F1117;
+    --sidebar-border: #1E2130;
+    --sidebar-text: #A0A8C0;
+    --sidebar-heading: #E2E8F4;
+    --main-bg: #F8F9FC;
+    --card-bg: #FFFFFF;
+    --card-border: #E8ECF4;
+    --text-primary: #0F1117;
+    --text-secondary: #5A6380;
+    --text-muted: #8890A8;
+    --green: #22C55E;
+    --yellow: #EAB308;
+    --amber: #F97316;
+    --red: #EF4444;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 24px rgba(0,0,0,0.10);
+  }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; background: var(--main-bg); color: var(--text-primary); font-size: 14px; line-height: 1.5; }
+
+  /* ===== LAYOUT ===== */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--sidebar-border);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .sidebar-logo h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mv-orange);
+  }
+  .sidebar-logo p { font-size: 11px; color: var(--sidebar-text); margin-top: 2px; }
+
+  .sidebar-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .sidebar-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 10px;
+  }
+  .sidebar-section-header h2 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--sidebar-text);
+  }
+  .sidebar-section-header .chevron {
+    color: var(--sidebar-text);
+    font-size: 10px;
+    transition: transform 0.2s;
+  }
+  .sidebar-section-header.collapsed .chevron { transform: rotate(-90deg); }
+  .collapsible-content { overflow: hidden; transition: max-height 0.3s ease; }
+  .collapsible-content.collapsed { max-height: 0 !important; }
+
+  .field-group { margin-bottom: 10px; }
+  .field-group label { display: block; font-size: 11px; font-weight: 500; color: var(--sidebar-text); margin-bottom: 4px; }
+  .field-group input {
+    width: 100%;
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-heading);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-group input:focus { border-color: var(--mv-orange); }
+  .field-group input::placeholder { color: #3A4060; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    padding: 8px 14px;
+  }
+  .btn-primary {
+    background: var(--mv-orange);
+    color: #fff;
+    width: 100%;
+  }
+  .btn-primary:hover { background: var(--mv-orange-light); }
+  .btn-primary:disabled { background: #3A4060; color: #5A6080; cursor: not-allowed; }
+  .btn-secondary {
+    background: #1A1E2E;
+    color: var(--sidebar-heading);
+    border: 1px solid #2A3050;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .btn-secondary:hover { border-color: var(--mv-orange); color: var(--mv-orange); }
+  .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--sidebar-text);
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .btn-ghost:hover { color: var(--sidebar-heading); }
+
+  .connected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(34,197,94,0.12);
+    color: var(--green);
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .connected-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .customer-select-wrap { position: relative; }
+  .customer-select-wrap select {
+    width: 100%;
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-heading);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  .customer-select-wrap select:focus { border-color: var(--mv-orange); }
+  .customer-select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sidebar-text);
+    pointer-events: none;
+    font-size: 12px;
+  }
+
+  /* Progress bar */
+  .progress-wrap { margin-top: 10px; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--sidebar-text);
+    margin-bottom: 5px;
+  }
+  .progress-bar-bg {
+    background: #1A1E2E;
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--mv-orange);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* Status log */
+  .status-log {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--sidebar-border);
+    font-size: 11px;
+    color: var(--sidebar-text);
+    min-height: 80px;
+  }
+  .status-log p { margin-bottom: 4px; }
+  .status-log .log-entry { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 3px; }
+  .status-log .log-time { color: #3A4060; flex-shrink: 0; }
+  .status-log .log-ok { color: var(--green); }
+  .status-log .log-err { color: var(--red); }
+  .status-log .log-info { color: var(--sidebar-text); }
+
+  /* ===== MAIN PANEL ===== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .main-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 56px;
+    flex-shrink: 0;
+  }
+  .main-header-info { flex: 1; }
+  .main-header-info h2 { font-size: 17px; font-weight: 700; }
+  .main-header-info p { font-size: 12px; color: var(--text-secondary); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-archetype { background: var(--mv-orange-dim); color: var(--mv-orange); }
+  .badge-stage { background: rgba(99,102,241,0.10); color: #6366F1; }
+  .badge-success { background: rgba(34,197,94,0.10); color: var(--green); }
+  .badge-warning { background: rgba(234,179,8,0.10); color: var(--yellow); }
+  .badge-danger { background: rgba(239,68,68,0.10); color: var(--red); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--card-bg);
+    padding: 0 28px;
+    flex-shrink: 0;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: 12px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { color: var(--mv-orange); border-bottom-color: var(--mv-orange); font-weight: 600; }
+
+  .tab-content { display: none; flex: 1; overflow-y: auto; padding: 24px 28px; }
+  .tab-content.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* Churn indicator */
+  .churn-bar {
+    height: 8px;
+    background: linear-gradient(to right, var(--green) 0%, var(--yellow) 40%, var(--amber) 65%, var(--red) 100%);
+    border-radius: 4px;
+    position: relative;
+    margin: 10px 0;
+  }
+  .churn-needle {
+    position: absolute;
+    top: -4px;
+    width: 4px;
+    height: 16px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transform: translateX(-2px);
+    transition: left 0.6s ease;
+  }
+  .churn-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Timeline */
+  .timeline { display: flex; flex-direction: column; gap: 10px; }
+  .timeline-item { display: flex; gap: 12px; align-items: flex-start; }
+  .timeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mv-orange);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .timeline-dot.inactive { background: var(--card-border); }
+  .timeline-content { flex: 1; }
+  .timeline-content strong { font-size: 12px; font-weight: 600; }
+  .timeline-content span { font-size: 11px; color: var(--text-muted); display: block; }
+
+  /* Bar chart */
+  .bar-chart-wrap { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 8px; }
+  .bar-chart-bar {
+    flex: 1;
+    background: var(--mv-orange-dim);
+    border-radius: 3px 3px 0 0;
+    position: relative;
+    transition: background 0.2s;
+    min-height: 4px;
+  }
+  .bar-chart-bar:hover { background: var(--mv-orange); }
+  .bar-chart-bar .bar-label {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .bar-chart-labels { display: flex; gap: 4px; margin-top: 20px; }
+  .bar-chart-labels span { flex: 1; text-align: center; font-size: 9px; color: var(--text-muted); }
+
+  /* Intervention */
+  .tone-selector { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .tone-btn {
+    background: #F1F3F9;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tone-btn.active, .tone-btn:hover {
+    background: var(--mv-orange-dim);
+    border-color: var(--mv-orange);
+    color: var(--mv-orange);
+  }
+
+  .message-box {
+    background: #FAFBFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    min-height: 120px;
+    outline: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    resize: vertical;
+    width: 100%;
+  }
+  .message-box:focus { border-color: var(--mv-orange); }
+
+  .confidence-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .confidence-track { flex: 1; height: 5px; background: var(--card-border); border-radius: 3px; overflow: hidden; }
+  .confidence-fill { height: 100%; background: var(--mv-orange); border-radius: 3px; }
+  .confidence-pct { font-size: 11px; font-weight: 600; color: var(--mv-orange); }
+
+  /* Action card */
+  .action-card {
+    border: 2px solid var(--mv-orange);
+    background: var(--mv-orange-dim);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .action-card h3 { font-size: 15px; font-weight: 700; color: var(--mv-orange); margin-bottom: 6px; }
+  .action-card p { font-size: 13px; color: var(--text-secondary); }
+
+  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .action-detail { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 12px; }
+  .action-detail label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .action-detail p { font-size: 13px; font-weight: 500; }
+
+  .save-btn {
+    background: var(--mv-orange);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 12px;
+  }
+  .save-btn:hover { background: var(--mv-orange-light); }
+  .save-btn:disabled { background: var(--card-border); color: var(--text-muted); cursor: not-allowed; }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 40px;
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+  .empty-state p { font-size: 13px; max-width: 280px; line-height: 1.6; }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  .spinner-dark {
+    border-color: rgba(232,93,38,0.2);
+    border-top-color: var(--mv-orange);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Loading overlay */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,17,23,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-overlay .big-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  /* Key-value pair */
+  .kv { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .kv-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); min-width: 100px; flex-shrink: 0; padding-top: 1px; }
+  .kv-value { font-size: 13px; color: var(--text-primary); flex: 1; }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .data-table th { text-align: left; padding: 8px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); border-bottom: 1px solid var(--card-border); }
+  .data-table td { padding: 8px 10px; border-bottom: 1px solid #F1F3F9; color: var(--text-secondary); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #FAFBFF; }
+
+  /* Chip */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    background: #F1F3F9;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 2px 2px 2px 0;
+    font-weight: 500;
+  }
+
+  /* section divider */
+  .divider { border: none; border-top: 1px solid var(--card-border); margin: 16px 0; }
+
+  /* tooltip */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0F1117;
+    color: #E2E8F4;
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* ===== DOW HEATMAP ===== */
+  .dow-bar { flex: 1; border-radius: 4px 4px 0 0; min-height: 4px; transition: opacity 0.2s; position: relative; cursor: default; }
+  .dow-bar:hover { opacity: 0.8; }
+  .dow-label { flex: 1; text-align: center; font-size: 10px; color: var(--text-muted); }
+  .dow-activity-icon { font-size: 9px; text-align: center; flex: 1; margin-top: 3px; color: var(--text-muted); white-space: nowrap; overflow: hidden; }
+
+  /* ===== EMAIL POPOVER ===== */
+  .email-popover {
+    position: fixed;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 12px 14px;
+    z-index: 200;
+    min-width: 240px;
+    max-width: 340px;
+    max-height: 260px;
+    overflow-y: auto;
+    display: none;
+  }
+  .email-popover h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px; }
+  .email-popover-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 7px; padding-bottom: 7px; border-bottom: 1px solid #F1F3F9; }
+  .email-popover-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .email-action-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .email-popover-subject { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+  .email-popover-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ===== EVE BLOCKQUOTE ===== */
+  .eve-quote {
+    border-left: 3px solid var(--mv-orange);
+    background: var(--mv-orange-dim);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .eve-quote p { font-size: 13px; line-height: 1.6; color: var(--text-primary); font-style: italic; }
+  .eve-quote cite { font-size: 10px; color: var(--text-muted); font-style: normal; display: block; margin-top: 6px; }
+  .eve-quote cite a { color: var(--mv-orange); text-decoration: none; }
+  .eve-quote cite a:hover { text-decoration: underline; }
+
+  /* ===== ARCHETYPE FILTER ===== */
+  .archetype-filter-wrap { margin-bottom: 8px; }
+  .archetype-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .archetype-chip {
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-text);
+    border-radius: 20px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .archetype-chip:hover, .archetype-chip.active {
+    background: var(--mv-orange-dim);
+    border-color: var(--mv-orange);
+    color: var(--mv-orange);
+  }
+
+  /* ===== COMPLETION BARS ===== */
+  .completion-row { display: grid; grid-template-columns: 1fr auto 80px 32px; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .completion-name { font-size: 12px; font-weight: 500; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .completion-track { height: 8px; background: var(--card-border); border-radius: 4px; overflow: hidden; }
+  .completion-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .completion-pct { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: right; }
+  .completion-cat { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-align: center; white-space: nowrap; }
+
+  /* ===== WHEEL LEGEND ===== */
+  .wheel-legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; font-size: 12px; }
+  .wheel-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .recent-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; margin-left: 4px; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .sidebar { width: 260px; min-width: 260px; }
+    .action-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== SETUP MODAL ===== -->
+<div id="setupModal" style="display:none;position:fixed;inset:0;background:rgba(15,17,23,0.85);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#1A1E2E;border:1px solid #2A3050;border-radius:12px;padding:32px;width:420px;max-width:90vw;">
+    <div style="font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mv-orange);margin-bottom:4px;">Mindvalley</div>
+    <div style="font-size:20px;font-weight:700;color:#E2E8F4;margin-bottom:6px;">Retention Agent Setup</div>
+    <div style="font-size:12px;color:#A0A8C0;margin-bottom:24px;">Enter your credentials once — saved locally in your browser.</div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Airtable Token</label>
+      <input id="setupAirtableToken" type="password" placeholder="patXXXXXXXXXXXXXX..." style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Airtable Base ID</label>
+      <input id="setupBaseId" type="text" placeholder="appXXXXXXXXXXXXXX" style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
+    </div>
+    <div style="margin-bottom:24px;">
+      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Anthropic API Key</label>
+      <input id="setupAnthropicKey" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
+    </div>
+    <button onclick="saveSetup()" style="width:100%;background:var(--mv-orange);color:#fff;border:none;border-radius:6px;padding:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Connect →</button>
+    <div id="setupError" style="color:#EF4444;font-size:12px;margin-top:10px;display:none;"></div>
+  </div>
+</div>
+
+<div class="email-popover" id="emailPopover">
+  <h4 id="emailPopoverWeek">Week</h4>
+  <div id="emailPopoverList"></div>
+</div>
+
+<div class="email-popover" id="contentPopover">
+  <h4 id="contentPopoverTitle">Content</h4>
+  <div id="contentPopoverList"></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner big-spinner"></div>
+  <span id="loadingMsg">Analysing customer...</span>
+</div>
+
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Retention Agent</h1>
+      <p>Mindvalley Intelligence</p>
+    </div>
+
+    <!-- Status badge -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--sidebar-border);">
+      <div id="connectedBadge" style="display:none;" class="connected-badge">Connected</div>
+      <div id="connectingBadge" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sidebar-text);">
+        <div class="spinner" style="border-top-color:var(--sidebar-text);width:10px;height:10px;border-width:2px;"></div>
+        Connecting...
+      </div>
+      <div style="margin-top:6px;">
+        <button class="btn-ghost" style="font-size:10px;color:#3A4060;padding:0;" onclick="resetCredentials()">⚙ Reset credentials</button>
+      </div>
+    </div>
+
+    <!-- Customer Selector -->
+    <div class="sidebar-section" id="selectorSection">
+      <div class="sidebar-section-header">
+        <h2>Customer</h2>
+      </div>
+      <div class="archetype-filter-wrap">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--sidebar-text);margin-bottom:4px;">Filter by type</div>
+        <div class="archetype-chips" id="archetypeChips">
+          <span class="archetype-chip active" onclick="filterByArchetype(null,this)">All</span>
+        </div>
+      </div>
+      <div class="customer-select-wrap" style="margin-bottom:10px;">
+        <select id="customerSelect" disabled>
+          <option value="">— Connect first —</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="analyseBtn" onclick="analyseSelected()" disabled>
+        Analyse Selected Customer
+      </button>
+      <button class="btn btn-secondary" id="batchBtn" onclick="runBatch()" disabled>
+        Run Batch Analysis (All)
+      </button>
+      <div class="progress-wrap" id="progressWrap" style="display:none;">
+        <div class="progress-label">
+          <span id="progressText">Analysing...</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status log -->
+    <div class="status-log" id="statusLog">
+      <p style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;color:#3A4060;">Activity Log</p>
+      <div id="logEntries"></div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN PANEL ===== -->
+  <main class="main">
+    <div class="main-header" id="mainHeader">
+      <div class="main-header-info">
+        <h2 id="headerName">No customer selected</h2>
+        <div id="headerBadges" style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div id="headerChurn" style="display:none;text-align:right;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:2px;">Churn Risk</div>
+        <div id="headerChurnValue" style="font-size:22px;font-weight:700;color:var(--red);">—</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('profile',this)">📋 Profile</button>
+      <button class="tab-btn" onclick="switchTab('intervention',this)">💬 Intervention</button>
+      <button class="tab-btn" onclick="switchTab('action',this)">⚡ Action</button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-content active" id="tab-profile">
+      <div class="empty-state" id="emptyProfile">
+        <div class="icon">🔍</div>
+        <h3>No analysis yet</h3>
+        <p>Select a customer in the sidebar and click "Analyse Selected Customer" to begin.</p>
+      </div>
+      <div id="profileContent" style="display:none;">
+
+        <div class="card">
+          <div class="card-title">Churn Probability</div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="flex:1;">
+              <div class="churn-bar">
+                <div class="churn-needle" id="churnNeedle"></div>
+              </div>
+              <div class="churn-labels"><span>Low</span><span>Moderate</span><span>High</span><span>Critical</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div id="churnPct" style="font-size:28px;font-weight:800;"></div>
+              <div id="churnLabel" style="font-size:11px;font-weight:600;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Acquisition Story</div>
+          <div id="acquisitionStory"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Behavioural Summary</div>
+          <div id="behaviouralSummary"></div>
+          <hr class="divider" />
+          <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">Email Open Rate — Monthly</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">Each bar = one calendar month. Height = open rate %. Click a bar to see email titles.</div>
+          <div class="bar-chart-wrap" id="emailChart"></div>
+          <div class="bar-chart-labels" id="emailChartLabels"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">EVE Conversation Signals</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px;">Direct quotes from EVE chat — click to view record in Airtable</div>
+          <div id="eveSignals"></div>
+        </div>
+
+        <!-- Classification reasoning -->
+        <div class="card">
+          <div class="card-title">Why This Classification?</div>
+          <div id="classificationReasoning" style="font-size:13px;line-height:1.7;color:var(--text-secondary);"></div>
+        </div>
+
+        <!-- Engagement timeline -->
+        <div class="card">
+          <div class="card-title">Engagement Score — Last 12 Months</div>
+          <div style="position:relative;height:120px;margin-top:8px;">
+            <canvas id="engagementChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Content interaction breakdown -->
+        <div class="card">
+          <div class="card-title">Content Interaction Breakdown</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:10px;">Email count = emails opened (received × open rate). Click a bar to see titles.</div>
+          <div style="position:relative;height:160px;">
+            <canvas id="contentInteractionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Day-of-week heatmap -->
+        <div class="card">
+          <div class="card-title">Activity by Day of Week <span style="font-size:9px;font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(AI estimate — no timestamp data in records)</span></div>
+          <div id="dowHeatmap" style="display:flex;gap:6px;align-items:flex-end;height:64px;margin-top:8px;"></div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <div id="dowLabels" style="display:flex;gap:6px;width:100%;"></div>
+          </div>
+        </div>
+
+        <!-- Development Wheel -->
+        <div class="card">
+          <div class="card-title">Development Wheel</div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+            <div style="position:relative;width:220px;height:220px;flex-shrink:0;margin:0 auto;">
+              <canvas id="wheelChart"></canvas>
+            </div>
+            <div style="flex:1;min-width:160px;">
+              <div id="wheelLegend" style="margin-bottom:12px;"></div>
+              <div id="recentCourses"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course completion rates -->
+        <div class="card">
+          <div class="card-title">Course Completion Rates</div>
+          <div id="completionBars"></div>
+        </div>
+
+        <!-- Course Activity Timeline -->
+        <div class="card">
+          <div class="card-title">Course Activity Timeline</div>
+          <div class="timeline" id="courseTimeline"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Claude's Profile Summary</div>
+          <div id="profileSummaryText" style="font-size:13px;line-height:1.75;color:var(--text-secondary);white-space:pre-wrap;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intervention Tab -->
+    <div class="tab-content" id="tab-intervention">
+      <div class="empty-state" id="emptyIntervention">
+        <div class="icon">💬</div>
+        <h3>No intervention drafted</h3>
+        <p>Run an analysis first to get an AI-drafted intervention message.</p>
+      </div>
+      <div id="interventionContent" style="display:none;">
+
+        <div class="card">
+          <div class="card-title">Intervention Stage</div>
+          <div id="interventionStage" style="font-size:20px;font-weight:700;color:var(--mv-orange);"></div>
+          <div id="interventionRationale" style="font-size:13px;color:var(--text-secondary);margin-top:6px;line-height:1.6;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Primary Barrier Diagnosis</div>
+          <div id="barrierText" style="font-size:14px;font-weight:600;margin-bottom:8px;"></div>
+          <div id="barrierDetail" style="font-size:13px;color:var(--text-secondary);margin-top:4px;line-height:1.6;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Drafted Message</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <div class="tone-selector" id="toneBtns">
+              <button class="tone-btn active" onclick="setTone('warm', this)">Warm &amp; Personal</button>
+              <button class="tone-btn" onclick="setTone('direct', this)">Direct &amp; Practical</button>
+              <button class="tone-btn" onclick="setTone('vishen', this)">Vishen Voice</button>
+            </div>
+            <div id="channelLabel" style="font-size:11px;font-weight:600;background:#F1F3F9;border-radius:4px;padding:4px 10px;color:var(--text-secondary);">Channel: —</div>
+          </div>
+          <textarea class="message-box" id="messageBox" rows="8" spellcheck="true"></textarea>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:10px;">
+            <button class="save-btn" onclick="regenerateMessage()">↻ Regenerate</button>
+            <button class="save-btn" onclick="saveToAirtable()" id="saveBtn">Save to Airtable</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Tab -->
+    <div class="tab-content" id="tab-action">
+      <div class="empty-state" id="emptyAction">
+        <div class="icon">⚡</div>
+        <h3>No action plan</h3>
+        <p>Run an analysis to get a recommended action plan for this customer.</p>
+      </div>
+      <div id="actionContent" style="display:none;">
+
+        <div class="action-card">
+          <h3 id="actionType">—</h3>
+          <p id="actionDesc">—</p>
+        </div>
+
+        <div class="action-row" id="actionDetails"></div>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="card-title">Success Metrics</div>
+          <div id="successMetrics" style="font-size:13px;color:var(--text-secondary);line-height:1.7;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Follow-up Schedule</div>
+          <div id="followupSchedule" style="font-size:13px;color:var(--text-secondary);line-height:1.7;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Previous Agent Outputs</div>
+          <div id="prevOutputs">
+            <p style="color:var(--text-muted);font-size:12px;">No previous outputs found.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  airtableToken: '',
+  baseId: '',
+  anthropicKey: '',
+  customers: [],          // raw Airtable records from Customers table
+  currentAnalysis: null,  // { customer, allData, result }
+  currentTone: 'warm',
+  toneMessages: { warm: '', direct: '', vishen: '' },
+  batchRunning: false,
+  charts: {},       // Chart.js instances — destroyed before re-render
+  tableIds: {},          // { eveConversations: 'tblXXX', ... } for deep links
+  emailByWeek: [],       // pre-processed for click popover
+  contentItemsMap: {},   // { 'Email': [{title,date}], 'Masterclasses': [...], ... }
+};
+
+const TABLES = {
+  customers: 'Customers',
+  courseBehavior: 'Course_Behavior',
+  emailEngagement: 'Email_Engagement',
+  eveConversations: 'simulation',   // EVE conversations live in the 'simulation' table
+  agentOutputs: 'Agent_Outputs',
+};
+
+// ============================================================
+// UTILS
+// ============================================================
+function log(msg, type = 'info') {
+  const container = document.getElementById('logEntries');
+  const time = new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const el = document.createElement('div');
+  el.className = 'log-entry';
+  el.innerHTML = `<span class="log-time">${time}</span><span class="log-${type}">${escHtml(msg)}</span>`;
+  container.prepend(el);
+  // keep max 10 entries
+  while (container.children.length > 10) container.removeChild(container.lastChild);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showLoading(msg = 'Processing...') {
+  document.getElementById('loadingMsg').textContent = msg;
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+function toggleSection(contentId, headerEl) {
+  const el = document.getElementById(contentId);
+  const isCollapsed = el.classList.contains('collapsed');
+  el.classList.toggle('collapsed', !isCollapsed);
+  headerEl.classList.toggle('collapsed', !isCollapsed);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function churnColor(pct) {
+  if (pct < 30) return 'var(--green)';
+  if (pct < 55) return 'var(--yellow)';
+  if (pct < 75) return 'var(--amber)';
+  return 'var(--red)';
+}
+function churnBadgeClass(pct) {
+  if (pct < 30) return 'badge-success';
+  if (pct < 55) return 'badge-warning';
+  return 'badge-danger';
+}
+
+// ============================================================
+// AIRTABLE API
+// ============================================================
+async function airtableFetch(table, params = '') {
+  const base = state.baseId;
+  const token = state.airtableToken;
+  const encodedTable = encodeURIComponent(table);
+  let url = `https://api.airtable.com/v0/${base}/${encodedTable}${params ? '?' + params : ''}`;
+  let records = [];
+  while (url) {
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`Airtable [${table}]: ${res.status} ${err.error?.message || res.statusText}`);
+    }
+    const data = await res.json();
+    records = records.concat(data.records || []);
+    url = data.offset ? `https://api.airtable.com/v0/${base}/${encodedTable}?offset=${data.offset}` : null;
+  }
+  return records;
+}
+
+async function airtableCreate(table, fields) {
+  const base = state.baseId;
+  const token = state.airtableToken;
+  const encodedTable = encodeURIComponent(table);
+  const url = `https://api.airtable.com/v0/${base}/${encodedTable}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Airtable create [${table}]: ${res.status} ${err.error?.message || res.statusText}`);
+  }
+  return res.json();
+}
+
+async function airtableUpdate(table, recordId, fields) {
+  const base = state.baseId;
+  const token = state.airtableToken;
+  const encodedTable = encodeURIComponent(table);
+  const url = `https://api.airtable.com/v0/${base}/${encodedTable}/${recordId}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Airtable update [${table}]: ${res.status} ${err.error?.message || res.statusText}`);
+  }
+  return res.json();
+}
+
+// ============================================================
+// CONNECT & LOAD CUSTOMERS
+// ============================================================
+async function fetchTableIds() {
+  try {
+    const res = await fetch(`https://api.airtable.com/v0/meta/bases/${state.baseId}/tables`, {
+      headers: { Authorization: `Bearer ${state.airtableToken}` }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    (data.tables || []).forEach(t => {
+      // Map normalized names to table IDs
+      const key = t.name.toLowerCase().replace(/[^a-z0-9]/g,'_');
+      state.tableIds[key] = t.id;
+      state.tableIds[t.name] = t.id;
+    });
+  } catch(e) { /* non-critical */ }
+}
+
+async function connectAndLoad() {
+  log('Connecting to Airtable...', 'info');
+  try {
+    const [records] = await Promise.all([
+      airtableFetch(TABLES.customers),
+      fetchTableIds(),
+    ]);
+    state.customers = records;
+    populateCustomerSelect(records);
+    buildArchetypeChips(records);
+    document.getElementById('connectedBadge').style.display = 'inline-flex';
+    document.getElementById('connectingBadge').style.display = 'none';
+    document.getElementById('analyseBtn').disabled = false;
+    document.getElementById('batchBtn').disabled = false;
+    document.getElementById('customerSelect').disabled = false;
+    log(`Loaded ${records.length} customers.`, 'ok');
+  } catch (e) {
+    document.getElementById('connectingBadge').style.display = 'none';
+    log(`Connection failed: ${e.message}`, 'err');
+  }
+}
+
+function getCustomerName(fields) {
+  // Try every plausible name field
+  return fields.Name || fields.name || fields['Customer Name'] || fields.customer_name
+    || fields.Email || fields.email || fields.ID || Object.values(fields)[0] || 'Unknown';
+}
+
+function getArchetype(fields) {
+  return fields.Archetype || fields.archetype || fields.Persona || fields.persona || fields.Type || fields.type || '';
+}
+
+function populateCustomerSelect(records, archetypeFilter = null) {
+  const sel = document.getElementById('customerSelect');
+  sel.innerHTML = '<option value="">— Select a customer —</option>';
+  const sorted = [...records].sort((a, b) => getCustomerName(a.fields).localeCompare(getCustomerName(b.fields)));
+  sorted.forEach(r => {
+    const f = r.fields;
+    const archetype = getArchetype(f);
+    if (archetypeFilter && archetype !== archetypeFilter) return;
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = getCustomerName(f); // name only — no archetype appended
+    opt.dataset.archetype = archetype;
+    sel.appendChild(opt);
+  });
+}
+
+function buildArchetypeChips(records) {
+  const archetypes = [...new Set(records.map(r => getArchetype(r.fields)).filter(Boolean))].sort();
+  const container = document.getElementById('archetypeChips');
+  container.innerHTML = `<span class="archetype-chip active" onclick="filterByArchetype(null,this)">All</span>`;
+  archetypes.forEach(a => {
+    const chip = document.createElement('span');
+    chip.className = 'archetype-chip';
+    chip.textContent = a;
+    chip.onclick = function() { filterByArchetype(a, this); };
+    container.appendChild(chip);
+  });
+}
+
+function filterByArchetype(archetype, chipEl) {
+  document.querySelectorAll('.archetype-chip').forEach(c => c.classList.remove('active'));
+  chipEl.classList.add('active');
+  populateCustomerSelect(state.customers, archetype || null);
+}
+
+// ============================================================
+// FETCH ALL DATA FOR A CUSTOMER
+// ============================================================
+async function fetchCustomerData(airtableRecordId, customerFields) {
+  // Primary key: the customer_id string stored in the Customers table (e.g. "cust_001")
+  const custIdValue = customerFields.customer_id || null;
+  const custName    = getCustomerName(customerFields);
+
+  const [courseBeh, emailEng, eveConvs, prevOutputs] = await Promise.all([
+    airtableFetch(TABLES.courseBehavior).catch(() => []),
+    airtableFetch(TABLES.emailEngagement).catch(() => []),
+    airtableFetch(TABLES.eveConversations).catch(() => []),
+    airtableFetch(TABLES.agentOutputs).catch(() => []),
+  ]);
+
+  function matchRecord(r) {
+    const f = r.fields;
+    // 1. Match by customer_id string value (primary method for this base)
+    if (custIdValue && f.customer_id && String(f.customer_id) === String(custIdValue)) return true;
+    // 2. Match by Airtable linked-record ID (fallback for other bases)
+    for (const fld of ['Customer', 'customer', 'CustomerID']) {
+      if (Array.isArray(f[fld]) && f[fld].includes(airtableRecordId)) return true;
+      if (f[fld] === airtableRecordId) return true;
+    }
+    // 3. Match by name (last resort)
+    if (custName) {
+      for (const fld of ['customer_name', 'CustomerName', 'Name', 'name']) {
+        if (f[fld] && String(f[fld]).toLowerCase() === custName.toLowerCase()) return true;
+      }
+    }
+    return false;
+  }
+
+  return {
+    customer: customerFields,
+    customerId: airtableRecordId,
+    courseBehavior:   courseBeh.filter(matchRecord),
+    emailEngagement:  emailEng.filter(matchRecord),
+    eveConversations: eveConvs.filter(matchRecord),
+    prevOutputs:      prevOutputs.filter(matchRecord),
+  };
+}
+
+// ============================================================
+// CLAUDE API CALL
+// ============================================================
+async function callClaude(prompt, systemPrompt, maxTokens = 2000) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': state.anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Claude API: ${res.status} ${err.error?.message || res.statusText}`);
+  }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// ============================================================
+// AGENT PROMPT
+// ============================================================
+function buildAgentPrompt(allData, tone = 'warm') {
+  const { customer, courseBehavior, emailEngagement, eveConversations } = allData;
+
+  const customerJson = JSON.stringify(customer, null, 2);
+  const courseJson = JSON.stringify(courseBehavior.map(r => r.fields), null, 2);
+  const emailJson = JSON.stringify(emailEngagement.map(r => r.fields), null, 2);
+  const eveJson = JSON.stringify(eveConversations.map(r => r.fields), null, 2);
+
+  const toneInstructions = {
+    warm: 'Write the intervention message in a warm, personal, empathetic tone — like a caring mentor reaching out.',
+    direct: 'Write the intervention message in a direct, practical, results-focused tone. Skip the fluff, be clear about value.',
+    vishen: 'Write the intervention message in the style of Vishen Lakhiani — visionary, inspiring, slightly provocative, using phrases like "extraordinary", "upgraded life", "3 most important questions". Reference transformation and human potential.',
+  };
+
+  const systemPrompt = `You are a Mindvalley Retention Intelligence Agent. Your job is to analyse subscriber data and output a structured retention analysis. You must respond with valid JSON only — no markdown, no explanation, just the JSON object.
+
+Be specific, insightful, and action-oriented. Use the data to diagnose the real barriers to engagement and design targeted interventions.`;
+
+  const userPrompt = `Analyse this Mindvalley subscriber and return a JSON object with exactly this structure:
+
+{
+  "profile_summary": "A 3-4 paragraph narrative about this customer — who they are, their journey with Mindvalley, key behavioural patterns, and what the data reveals about their engagement. Be specific and reference actual data points.",
+
+  "churn_probability": <number 0-100>,
+  "churn_rationale": "One sentence explaining the churn probability score.",
+
+  "engagement_stage": "One of: Onboarding | Active Learner | At Risk | Dormant | Churned | Power User",
+
+  "acquisition_story": {
+    "source": "Where they came from",
+    "first_content": "First piece of content consumed",
+    "purchase_path": "How they became a customer"
+  },
+
+  "behavioural_signals": {
+    "course_activity": "Summary of course engagement patterns",
+    "email_trend": "Summary of email engagement trend",
+    "session_frequency": "How often they engage",
+    "last_active": "When they were last active"
+  },
+
+  "eve_signals": ["Array of 3-5 key signals extracted from EVE conversations"],
+
+  "course_timeline": [
+    { "course": "Course name", "action": "started/completed/abandoned", "date": "YYYY-MM-DD or approximate", "active": true }
+  ],
+
+  "email_weekly_opens": [<8 numbers, weekly open counts, most recent last>],
+
+  "intervention_stage": "One of: Immediate Outreach | Nurture Sequence | Re-engagement | Retention Offer | Celebrate Progress | No Action Needed",
+
+  "primary_barrier": "The main reason this subscriber isn't getting value",
+  "barrier_confidence": <number 0-100>,
+  "barrier_detail": "2-3 sentences explaining the barrier diagnosis based on the data.",
+
+  "drafted_message": {
+    "channel": "Email or EVE Push",
+    "subject": "Subject line (for email) or push title",
+    "body": "${toneInstructions[tone]}",
+    "tone": "${tone}"
+  },
+
+  "recommended_action": {
+    "type": "Automation or Human Escalation",
+    "title": "Short action title",
+    "description": "What should happen and why",
+    "channel": "Which channel",
+    "trigger": "What triggers this action",
+    "timing": "When to execute",
+    "priority": "High / Medium / Low"
+  },
+
+  "success_metrics": "How to measure if the intervention worked. 3-4 bullet points.",
+
+  "followup_schedule": "Recommended follow-up cadence and checkpoints.",
+
+  "classification_reasoning": "2-3 sentences citing the specific data signals (numbers, dates, patterns) that determined the engagement_stage and churn_probability scores.",
+
+  "engagement_timeline": [<12 numbers 0-100, monthly engagement score oldest→newest. Derive from login frequency, email opens, course activity each month>],
+
+  "engagement_heatmap": [<7 numbers 0-10, estimated activity level by day Mon Tue Wed Thu Fri Sat Sun, based on session/interaction timestamps if present>],
+
+  "development_wheel": {
+    "Mind": { "score": <0-10 depth of engagement>, "courses": ["course names that belong here"], "last_engaged": "YYYY-MM-DD or null" },
+    "Body": { "score": <0-10>, "courses": [], "last_engaged": null },
+    "Soul": { "score": <0-10>, "courses": [], "last_engaged": null },
+    "Entrepreneurship": { "score": <0-10>, "courses": [], "last_engaged": null },
+    "Career Growth": { "score": <0-10>, "courses": [], "last_engaged": null },
+    "Relationships": { "score": <0-10>, "courses": [], "last_engaged": null }
+  },
+
+  "course_completion_rates": [
+    { "course": "Course name", "category": "Mind|Body|Soul|Entrepreneurship|Career Growth|Relationships", "completion_pct": <0-100>, "started": "YYYY-MM-DD", "last_accessed": "YYYY-MM-DD" }
+  ],
+
+  "content_interactions": {
+    "Email": <number of email interactions>,
+    "Free Content": <number of free/organic content interactions>,
+    "Masterclasses": <number of masterclass interactions>,
+    "Subscription": <number of subscription/quest interactions>,
+    "Live Events": <number of live event interactions>
+  }
+}
+
+MINDVALLEY COURSE CATEGORY GUIDE (use this to classify courses into development_wheel categories):
+- Mind: meditation, mindfulness, consciousness, memory, focus, Silva Method, Super Reading, Becoming Limitless, 10x Focus
+- Body: fitness, nutrition, sleep, biohacking, Wildfit, WildFit, yoga, longevity, weight
+- Soul: spirituality, purpose, intuition, energy healing, life purpose, Be Extraordinary
+- Entrepreneurship: business, money, wealth, startup, Mindvalley Business, marketing, sales, entrepreneurship
+- Career Growth: productivity, skills, leadership, negotiation, communication, public speaking
+- Relationships: love, relationships, dating, parenting, family, social intelligence
+
+CUSTOMER DATA:
+${customerJson}
+
+COURSE BEHAVIOR:
+${courseJson}
+
+EMAIL ENGAGEMENT:
+${emailJson}
+
+EVE CONVERSATIONS:
+${eveJson}
+
+Remember: respond with valid JSON ONLY. No markdown code blocks, no explanation.`;
+
+  return { systemPrompt, userPrompt };
+}
+
+// ============================================================
+// ANALYSE A CUSTOMER
+// ============================================================
+async function analyseCustomer(customerId, customerRec, tone = 'warm', silent = false) {
+  const displayName = getCustomerName(customerRec);
+  if (!silent) showLoading(`Analysing ${displayName}...`);
+  log(`Fetching data for ${displayName}...`, 'info');
+
+  try {
+    const allData = await fetchCustomerData(customerId, customerRec);
+    log('Data fetched. Calling Claude...', 'info');
+
+    const { systemPrompt, userPrompt } = buildAgentPrompt(allData, tone);
+    log('Waiting for Claude response...', 'info');
+    const raw = await callClaude(userPrompt, systemPrompt, 4096);
+    log('Claude responded. Parsing...', 'info');
+
+    let result;
+    try {
+      const cleaned = raw.replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/,'').trim();
+      result = JSON.parse(cleaned);
+    } catch(e) {
+      throw new Error(`JSON parse failed: ${e.message}. Response: ${raw.substring(0,300)}`);
+    }
+
+    state.currentAnalysis = { customerId, customer: customerRec, allData, result, tone };
+    state.toneMessages.warm = result.drafted_message?.body || '';
+    state.toneMessages.direct = '';
+    state.toneMessages.vishen = '';
+    state.currentTone = tone;
+
+    if (!silent) {
+      renderAnalysis(state.currentAnalysis);
+      log(`Analysis complete for ${displayName}.`, 'ok');
+    }
+    return result;
+  } catch(e) {
+    log(`Analysis failed: ${e.message}`, 'err');
+    console.error('analyseCustomer error:', e);
+    if (!silent) throw e;
+  } finally {
+    if (!silent) hideLoading();
+  }
+}
+
+async function analyseSelected() {
+  const sel = document.getElementById('customerSelect');
+  const id = sel.value;
+  if (!id) { log('Please select a customer.', 'err'); return; }
+  const rec = state.customers.find(r => r.id === id);
+  if (!rec) { log('Customer record not found.', 'err'); return; }
+  try {
+    await analyseCustomer(id, rec.fields, state.currentTone);
+  } catch(e) {
+    // already logged inside analyseCustomer
+  }
+}
+
+// ============================================================
+// BATCH ANALYSIS
+// ============================================================
+async function runBatch() {
+  if (state.batchRunning) return;
+  if (state.customers.length === 0) { log('No customers loaded.', 'err'); return; }
+  state.batchRunning = true;
+  const progressWrap = document.getElementById('progressWrap');
+  progressWrap.style.display = 'block';
+  const total = state.customers.length;
+  let done = 0;
+
+  for (const rec of state.customers) {
+    const name = rec.fields.Name || rec.id;
+    updateProgress(done, total, `Analysing ${name}...`);
+    try {
+      const result = await analyseCustomer(rec.id, rec.fields, 'warm', true);
+      await saveResultToAirtable(rec.id, rec.fields, result, rec.fields.Name);
+      log(`✓ ${name}`, 'ok');
+    } catch(e) {
+      log(`✗ ${name}: ${e.message}`, 'err');
+    }
+    done++;
+    await delay(800); // be kind to APIs
+  }
+
+  updateProgress(total, total, 'Batch complete!');
+  state.batchRunning = false;
+  log(`Batch complete. ${done}/${total} analysed.`, 'ok');
+  setTimeout(() => { progressWrap.style.display = 'none'; }, 3000);
+}
+
+function updateProgress(done, total, label) {
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  document.getElementById('progressText').textContent = label;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================================
+// RENDER ANALYSIS
+// ============================================================
+function renderAnalysis({ customer, allData, result }) {
+  // Header
+  const name = customer.Name || customer.name || 'Customer';
+  document.getElementById('headerName').textContent = name;
+  const badgesEl = document.getElementById('headerBadges');
+  badgesEl.innerHTML = '';
+  if (customer.Archetype || customer.archetype) {
+    badgesEl.innerHTML += `<span class="badge badge-archetype">${escHtml(customer.Archetype || customer.archetype)}</span>`;
+  }
+  // Prefer Airtable engagement_stage field; fall back to Claude's estimate
+  const engagementStage = customer.engagement_stage || customer.Engagement_Stage || result.engagement_stage;
+  if (engagementStage) {
+    badgesEl.innerHTML += `<span class="badge badge-stage">${escHtml(engagementStage)}</span>`;
+  }
+
+  // Churn — prefer Airtable churn_probability field; fall back to Claude's estimate
+  const churnFromAirtable = parseChurnValue(customer.churn_probability || customer.Churn_Probability);
+  const churn = churnFromAirtable !== null ? churnFromAirtable : (result.churn_probability || 0);
+  document.getElementById('headerChurn').style.display = 'block';
+  document.getElementById('headerChurnValue').textContent = churn + '%';
+  document.getElementById('headerChurnValue').style.color = churnColor(churn);
+
+  // ---- PROFILE TAB ----
+  document.getElementById('emptyProfile').style.display = 'none';
+  document.getElementById('profileContent').style.display = 'block';
+
+  // Churn bar
+  document.getElementById('churnNeedle').style.left = Math.min(98, churn) + '%';
+  document.getElementById('churnPct').textContent = churn + '%';
+  document.getElementById('churnPct').style.color = churnColor(churn);
+  const labels = { low:'Low Risk', mid:'Moderate Risk', high:'High Risk', crit:'Critical Risk' };
+  let lbl = churn < 30 ? 'Low Risk' : churn < 55 ? 'Moderate Risk' : churn < 75 ? 'High Risk' : 'Critical Risk';
+  document.getElementById('churnLabel').textContent = lbl;
+  document.getElementById('churnLabel').style.color = churnColor(churn);
+
+  // Acquisition story
+  const acq = result.acquisition_story || {};
+  document.getElementById('acquisitionStory').innerHTML = `
+    <div class="kv"><span class="kv-label">Source</span><span class="kv-value">${escHtml(acq.source || '—')}</span></div>
+    <div class="kv"><span class="kv-label">First Content</span><span class="kv-value">${escHtml(acq.first_content || '—')}</span></div>
+    <div class="kv"><span class="kv-label">Purchase Path</span><span class="kv-value">${escHtml(acq.purchase_path || '—')}</span></div>
+  `;
+
+  // Behavioural summary
+  const beh = result.behavioural_signals || {};
+  document.getElementById('behaviouralSummary').innerHTML = `
+    <div class="kv"><span class="kv-label">Course Activity</span><span class="kv-value">${escHtml(beh.course_activity || '—')}</span></div>
+    <div class="kv"><span class="kv-label">Email Trend</span><span class="kv-value">${escHtml(beh.email_trend || '—')}</span></div>
+    <div class="kv"><span class="kv-label">Session Freq.</span><span class="kv-value">${escHtml(beh.session_frequency || '—')}</span></div>
+    <div class="kv"><span class="kv-label">Last Active</span><span class="kv-value">${escHtml(beh.last_active || '—')}</span></div>
+  `;
+
+  // Email chart — built entirely from actual Airtable records
+  const emailMonthData = processEmailRecords(allData.emailEngagement || [], customer);
+  renderBarChart(emailMonthData);
+
+  // Classification reasoning
+  document.getElementById('classificationReasoning').textContent = result.classification_reasoning || '—';
+
+  // Engagement timeline — derived from actual email open rate data per month
+  renderEngagementChart(computeEngagementTimelineFromRecords(allData.emailEngagement || []));
+
+  // Content interaction breakdown — entirely from actual Airtable records, no Claude estimates.
+  const contentData = buildContentItemsMap(allData.emailEngagement || [], allData.courseBehavior || []);
+  state.contentItemsMap = contentData.items;
+  renderContentInteractionChart(contentData.counts);
+
+  // Day-of-week heatmap — use Claude's estimate (records have no day-of-week data in this base)
+  renderDowHeatmap(result.engagement_heatmap || [], null);
+
+  // Development Wheel — computed from actual Course_Behavior records
+  renderDevelopmentWheel(computeWheelFromRecords(allData.courseBehavior || []));
+
+  // Course completion rates — from actual Course_Behavior records
+  renderCompletionBars(allData.courseBehavior || []);
+
+  // EVE signals — real quotes with deep links when available
+  renderEveSignals(result.eve_signals || [], allData.eveConversations || []);
+
+  // Course timeline — from actual Course_Behavior records
+  renderCourseTimeline(allData.courseBehavior || []);
+
+  // Profile summary text
+  document.getElementById('profileSummaryText').textContent = result.profile_summary || '—';
+
+  // ---- INTERVENTION TAB ----
+  document.getElementById('emptyIntervention').style.display = 'none';
+  document.getElementById('interventionContent').style.display = 'block';
+
+  document.getElementById('interventionStage').textContent = result.intervention_stage || '—';
+  document.getElementById('interventionRationale').textContent = result.churn_rationale || (churnFromAirtable !== null ? `Airtable churn risk: ${customer.churn_probability || customer.Churn_Probability || churn}%` : '');
+
+  document.getElementById('barrierText').textContent = result.primary_barrier || '—';
+  document.getElementById('barrierDetail').textContent = result.barrier_detail || '';
+
+  // Message
+  state.toneMessages.warm = result.drafted_message?.body || '';
+  state.toneMessages.direct = '';
+  state.toneMessages.vishen = '';
+  document.getElementById('messageBox').value = state.toneMessages.warm;
+  document.getElementById('channelLabel').textContent = 'Channel: ' + (result.drafted_message?.channel || '—');
+
+  // Reset tone buttons
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.tone-btn').classList.add('active');
+  state.currentTone = 'warm';
+
+  // ---- ACTION TAB ----
+  document.getElementById('emptyAction').style.display = 'none';
+  document.getElementById('actionContent').style.display = 'block';
+
+  const action = result.recommended_action || {};
+  document.getElementById('actionType').textContent = (action.type === 'Human Escalation' ? '🚨 ' : '🤖 ') + (action.title || '—');
+  document.getElementById('actionDesc').textContent = action.description || '—';
+
+  document.getElementById('actionDetails').innerHTML = `
+    <div class="action-detail"><label>Channel</label><p>${escHtml(action.channel || '—')}</p></div>
+    <div class="action-detail"><label>Trigger</label><p>${escHtml(action.trigger || '—')}</p></div>
+    <div class="action-detail"><label>Timing</label><p>${escHtml(action.timing || '—')}</p></div>
+    <div class="action-detail"><label>Priority</label><p>${escHtml(action.priority || '—')}</p></div>
+  `;
+
+  document.getElementById('successMetrics').innerHTML = (result.success_metrics || '—')
+    .split('\n').filter(Boolean)
+    .map(line => `<div style="display:flex;gap:8px;margin-bottom:5px;"><span style="color:var(--mv-orange);">✓</span><span>${escHtml(line.replace(/^[-•*]\s*/,''))}</span></div>`).join('');
+
+  document.getElementById('followupSchedule').textContent = result.followup_schedule || '—';
+
+  // Previous outputs
+  const prev = allData.prevOutputs || [];
+  if (prev.length) {
+    document.getElementById('prevOutputs').innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>Date</th><th>Stage</th><th>Action</th><th>Churn %</th></tr></thead>
+        <tbody>${prev.map(r => `
+          <tr>
+            <td>${escHtml(r.fields.Analysis_Date || r.fields.Created || '—')}</td>
+            <td>${escHtml(r.fields.Intervention_Stage || '—')}</td>
+            <td>${escHtml(r.fields.Recommended_Action || '—')}</td>
+            <td>${escHtml(String(r.fields.Churn_Probability || '—'))}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } else {
+    document.getElementById('prevOutputs').innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No previous outputs found.</p>';
+  }
+}
+
+// ---- Process email records into monthly bars ----
+// Returns array (oldest→newest, up to 8) of { label, count, openRate, clickRate, titles[] }
+// Derives calendar month labels when months_as_member is available on the customer.
+function processEmailRecords(emailRecords, customerFields) {
+  if (!emailRecords.length) return [];
+  const sorted = [...emailRecords]
+    .sort((a, b) => (a.fields.month_number || 0) - (b.fields.month_number || 0))
+    .slice(-8);
+
+  // Derive calendar month labels if we know how long they've been a member
+  const monthsAsMember = customerFields?.months_as_member || null;
+  const now = new Date();
+
+  return sorted.map(r => {
+    const f = r.fields;
+    const rawTitles = f.email_titles_interacted || f.Email_Titles_Interacted || '';
+    const titles = rawTitles.split('\n').map(s => s.trim()).filter(Boolean);
+
+    let label;
+    if (monthsAsMember && f.month_number) {
+      // month_number 1 = their first month. Convert to calendar month.
+      const monthsAgo = monthsAsMember - f.month_number;
+      const d = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 1);
+      label = d.toLocaleString('default', { month: 'short', year: '2-digit' });
+    } else {
+      label = `Mo.${f.month_number || '?'}`;
+    }
+
+    return {
+      label,
+      count:     f.emails_received    || 0,
+      openRate:  f.open_rate_percent  || 0,
+      clickRate: f.click_rate_percent || 0,
+      converted: f.converted_on_offer || '',
+      offerType: f.offer_type_if_converted || '',
+      topicsOpened:  f.topics_opened  || '',
+      topicsIgnored: f.topics_ignored || '',
+      titles,
+    };
+  });
+}
+
+// ---- Compute predominant activity per day-of-week from raw records ----
+function computeDowActivity(emailRecords, courseRecords, eveRecords) {
+  const days = Array.from({ length: 7 }, () => ({ email: 0, course: 0, eve: 0 }));
+  function add(records, type) {
+    records.forEach(r => {
+      const f = r.fields;
+      const ds = f.Date || f.date || f.Created || f.created || null;
+      if (!ds) return;
+      const d = new Date(ds);
+      if (isNaN(d)) return;
+      const dow = (d.getDay() + 6) % 7; // Mon=0 … Sun=6
+      days[dow][type]++;
+    });
+  }
+  add(emailRecords, 'email');
+  add(courseRecords, 'course');
+  add(eveRecords, 'eve');
+  return days;
+}
+
+function renderBarChart(emailMonthData, _unused) {
+  const container = document.getElementById('emailChart');
+  state.emailByWeek = emailMonthData || []; // reuse same state key for popover
+
+  if (!emailMonthData || emailMonthData.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No email data found.</p>'; return;
+  }
+
+  // Use open rate % as bar height — it normalises across months with different volumes
+  const values = emailMonthData.map(m => m.openRate);
+  const maxVal = Math.max(...values, 1);
+
+  container.innerHTML = emailMonthData.map((m, i) => {
+    const h         = Math.max(4, Math.round((m.openRate / maxVal) * 55));
+    const hasItems  = m.titles.length > 0;
+    const style     = `height:${h}px;${hasItems ? 'cursor:pointer;background:var(--mv-orange);opacity:0.75;' : 'opacity:0.35;'}`;
+    const tipLines  = [`${m.openRate}% open · ${m.clickRate}% click · ${m.count} emails`];
+    if (m.converted) tipLines.push(`Converted: ${m.converted}${m.offerType ? ' — ' + m.offerType : ''}`);
+    if (hasItems) tipLines.push('Click to see titles');
+    return `<div class="bar-chart-bar" style="${style}" title="${tipLines.join('\n')}"
+      onclick="showEmailPopover(event,${i})"
+    ><span class="bar-label">${m.label}</span></div>`;
+  }).join('');
+}
+
+// ---- Engagement timeline (line chart via Chart.js) ----
+function renderEngagementChart(timeline) {
+  if (state.charts.engagement) { state.charts.engagement.destroy(); state.charts.engagement = null; }
+  const canvas = document.getElementById('engagementChart');
+  if (!canvas) return;
+  const data = (timeline && timeline.length) ? timeline : Array(12).fill(0);
+  const now = new Date();
+  const labels = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
+    return d.toLocaleString('default', { month: 'short' });
+  });
+  state.charts.engagement = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#E85D26',
+        backgroundColor: 'rgba(232,93,38,0.10)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#E85D26',
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 100, grid: { color: '#E8ECF4' }, ticks: { font: { size: 10 }, color: '#8890A8', stepSize: 25 } },
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8890A8' } }
+      }
+    }
+  });
+}
+
+// ---- Content interaction breakdown (horizontal bar chart) ----
+const CONTENT_COLORS = {
+  'Email':        '#3B82F6',
+  'Free Content': '#22C55E',
+  'Masterclasses':'#8B5CF6',
+  'Live Events':  '#EC4899',
+};
+
+// ---- Build a map of actual content titles per interaction type ----
+// Email count = total emails actually opened (received × open_rate), so it matches the email chart.
+// Items list = deduplicated actual titles only — no placeholder text.
+// Subscription removed; course records only populate Free Content / Masterclasses / Live Events
+// when the course_topic explicitly matches those types.
+function buildContentItemsMap(emailRecords, courseRecords) {
+  const BUCKETS = ['Email', 'Free Content', 'Masterclasses', 'Live Events'];
+  const items  = Object.fromEntries(BUCKETS.map(b => [b, []]));
+  const counts = Object.fromEntries(BUCKETS.map(b => [b, 0]));
+
+  // Email: count = total emails opened across all months; items = actual titles interacted with
+  const seenTitles = new Set();
+  emailRecords.forEach(r => {
+    const f = r.fields;
+    // Opened count: round(received × open_rate%). This matches the email bar chart's data.
+    counts['Email'] += Math.round((f.emails_received || 0) * (f.open_rate_percent || 0) / 100);
+    // Titles: only add lines that are actual subject lines (non-empty, no placeholders)
+    const rawTitles = f.email_titles_interacted || f.Email_Titles_Interacted || '';
+    const month = f.month_number ? `Month ${f.month_number}` : '';
+    const converted = f.converted_on_offer && f.converted_on_offer !== 'No' ? f.converted_on_offer : '';
+    rawTitles.split('\n').map(s => s.trim()).filter(Boolean).forEach(title => {
+      if (!seenTitles.has(title)) {
+        seenTitles.add(title);
+        items['Email'].push({ title, date: month, action: converted ? `Converted: ${converted}` : '' });
+      }
+    });
+  });
+
+  // Courses: only add to Free Content / Masterclasses / Live Events if topic explicitly matches.
+  // Subscription quests are tracked in the Completion Rates and Timeline charts; skip them here.
+  const seenCourse = { 'Free Content': new Set(), 'Masterclasses': new Set(), 'Live Events': new Set() };
+  courseRecords.forEach(r => {
+    const f = r.fields;
+    const t = (f.course_topic || '').toLowerCase();
+    let bucket = null;
+    if (t.includes('free') || t.includes('blog') || t.includes('article')) bucket = 'Free Content';
+    else if (t.includes('masterclass') || t.includes('master class'))       bucket = 'Masterclasses';
+    else if (t.includes('live') || t.includes('event') || t.includes('webinar')) bucket = 'Live Events';
+    if (!bucket) return; // skip subscription quests
+
+    const title  = f.course_name || f.course || '—';
+    const date   = f.started_date_months_ago != null ? `Started ${f.started_date_months_ago} mo. ago` : '';
+    const action = f.completion_percentage != null ? `${f.completion_percentage}% complete` : '';
+    counts[bucket]++;
+    if (!seenCourse[bucket].has(title)) {
+      seenCourse[bucket].add(title);
+      items[bucket].push({ title, date, action });
+    }
+  });
+
+  return { items, counts };
+}
+
+// ---- Show content popover on chart bar click ----
+function showContentPopover(nativeEvent, label, color) {
+  const popover  = document.getElementById('contentPopover');
+  const titleEl  = document.getElementById('contentPopoverTitle');
+  const listEl   = document.getElementById('contentPopoverList');
+  const items    = (state.contentItemsMap && state.contentItemsMap[label]) || [];
+
+  titleEl.textContent = label;
+  titleEl.style.color = color || 'var(--mv-orange)';
+
+  if (items.length === 0) {
+    listEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No individual records found for this type.</p>';
+  } else {
+    listEl.innerHTML = items.map(i => `
+      <div class="email-popover-item">
+        <div class="email-action-dot" style="background:${color || 'var(--mv-orange)'};"></div>
+        <div>
+          <div class="email-popover-subject">${escHtml(i.title)}</div>
+          <div class="email-popover-meta">${[i.action, i.date || ''].filter(Boolean).join(' · ')}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Position near the click point
+  const pw = 300;
+  let left = (nativeEvent.clientX || 0) - pw / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  let top  = (nativeEvent.clientY || 0) - 8;
+  popover.style.cssText = `display:block;left:${left}px;top:${top}px;transform:translateY(-100%);`;
+}
+
+function renderContentInteractionChart(interactions) {
+  if (state.charts.contentInteraction) { state.charts.contentInteraction.destroy(); state.charts.contentInteraction = null; }
+  const canvas = document.getElementById('contentInteractionChart');
+  if (!canvas || !interactions) return;
+
+  const labels = Object.keys(interactions);
+  const values = Object.values(interactions);
+  const colors = labels.map(l => CONTENT_COLORS[l] || '#8890A8');
+
+  if (values.every(v => v === 0)) {
+    canvas.parentElement.innerHTML = '<p style="color:var(--text-muted);font-size:12px;padding:8px 0;">No interaction data available.</p>';
+    return;
+  }
+
+  canvas.style.cursor = 'pointer';
+  canvas.title = 'Click a bar to see titles';
+
+  state.charts.contentInteraction = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors.map(c => c + 'BB'),
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 6,
+        hoverBackgroundColor: colors,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => ` ${ctx.raw} interactions — click to see titles` }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#E8ECF4' }, ticks: { font: { size: 10 }, color: '#8890A8' } },
+        y: { grid: { display: false }, ticks: { font: { size: 11, weight: '500' }, color: '#5A6380' } }
+      },
+      onClick(event, elements) {
+        if (!elements.length) return;
+        const idx   = elements[0].index;
+        const label = labels[idx];
+        const color = colors[idx];
+        showContentPopover(event.native, label, color);
+      }
+    }
+  });
+}
+
+// ---- Day-of-week heatmap ----
+function renderDowHeatmap(heatmap, dowActivity) {
+  const container = document.getElementById('dowHeatmap');
+  const labelsEl = document.getElementById('dowLabels');
+  if (!container) return;
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const data = (heatmap && heatmap.length === 7) ? heatmap : Array(7).fill(0);
+  const maxVal = Math.max(...data, 1);
+  const BAR_COLOR = '#E85D26';
+
+  // Activity icon + tooltip per day
+  const ACTIVITY_ICON = { email: '📧', course: '📚', eve: '💬' };
+  const ACTIVITY_LABEL = { email: 'email', course: 'course', eve: 'chat' };
+
+  function dominantActivity(dow) {
+    if (!dowActivity) return null;
+    const d = dowActivity[dow];
+    if (!d) return null;
+    const total = d.email + d.course + d.eve;
+    if (total === 0) return null;
+    const top = Object.entries(d).sort((a,b) => b[1]-a[1])[0];
+    return { type: top[0], count: top[1], total };
+  }
+
+  container.innerHTML = days.map((day, i) => {
+    const h = Math.max(6, Math.round((data[i] / maxVal) * 52));
+    const act = dominantActivity(i);
+    const tip = act
+      ? `${day}: ${data[i]}/10 activity · mostly ${ACTIVITY_LABEL[act.type]} (${act.count}/${act.total})`
+      : `${day}: ${data[i]}/10`;
+    return `<div class="dow-bar" style="height:${h}px;background:${BAR_COLOR};opacity:0.65;" title="${tip}"></div>`;
+  }).join('');
+
+  // Labels + activity icon row
+  labelsEl.innerHTML = days.map((day, i) => {
+    const act = dominantActivity(i);
+    const icon = act ? ACTIVITY_ICON[act.type] : '';
+    return `<div style="flex:1;text-align:center;">
+      <div class="dow-label">${day}</div>
+      <div class="dow-activity-icon" title="${act ? 'Mostly ' + ACTIVITY_LABEL[act.type] : ''}">${icon}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Development Wheel (radar chart) ----
+const WHEEL_CATEGORIES = ['Mind','Body','Soul','Entrepreneurship','Career Growth','Relationships'];
+const WHEEL_COLORS = {
+  'Mind':           '#8B5CF6',
+  'Body':           '#22C55E',
+  'Soul':           '#F59E0B',
+  'Entrepreneurship': '#3B82F6',
+  'Career Growth':  '#E85D26',
+  'Relationships':  '#EC4899',
+};
+// Recent rank badge colors: 1st = gold, 2nd = silver, 3rd = bronze
+const RECENT_COLORS = ['#F59E0B','#94A3B8','#CD7F32'];
+const RECENT_LABELS = ['Most Recent','2nd Recent','3rd Recent'];
+
+// ---- Parse churn_probability field (Airtable singleSelect or number) → 0-100 ----
+function parseChurnValue(raw) {
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'number') return raw;
+  const s = String(raw).toLowerCase().trim();
+  const MAP = { low: 15, moderate: 45, medium: 45, high: 70, 'very high': 85, critical: 90, churned: 100 };
+  if (MAP[s] !== undefined) return MAP[s];
+  const num = parseFloat(s.replace('%', ''));
+  if (!isNaN(num)) return num;
+  return null;
+}
+
+// ---- Map course_topic → Development Wheel category ----
+function topicToWheelCategory(topic) {
+  const t = String(topic || '').toLowerCase().trim();
+  if (!t) return 'Mind'; // default
+  // Direct matches first
+  const direct = WHEEL_CATEGORIES.find(c => c.toLowerCase() === t);
+  if (direct) return direct;
+  if (t.includes('peak performance') || t.includes('mind') || t.includes('meditation') || t.includes('focus') || t.includes('consciousness') || t.includes('memory') || t.includes('cognitive') || t.includes('mental')) return 'Mind';
+  if (t.includes('body') || t.includes('fitness') || t.includes('nutrition') || t.includes('sleep') || t.includes('health') || t.includes('biohack') || t.includes('yoga') || t.includes('longevity') || t.includes('weight')) return 'Body';
+  if (t.includes('soul') || t.includes('spiritual') || t.includes('purpose') || t.includes('intuition') || t.includes('energy')) return 'Soul';
+  if (t.includes('entrepreneur') || t.includes('business') || t.includes('wealth') || t.includes('money') || t.includes('startup') || t.includes('marketing') || t.includes('sales')) return 'Entrepreneurship';
+  if (t.includes('career') || t.includes('leadership') || t.includes('communication') || t.includes('skill') || t.includes('public speak') || t.includes('negotiat') || t.includes('productivity')) return 'Career Growth';
+  if (t.includes('relationship') || t.includes('parent') || t.includes('family') || t.includes('love') || t.includes('dating') || t.includes('social')) return 'Relationships';
+  return 'Mind';
+}
+
+// ---- Compute Development Wheel from actual Course_Behavior records ----
+function computeWheelFromRecords(courseRecords) {
+  const wheel = {};
+  WHEEL_CATEGORIES.forEach(cat => { wheel[cat] = { score: 0, courses: [], last_engaged: null }; });
+  if (!courseRecords || courseRecords.length === 0) return wheel;
+
+  courseRecords.forEach(r => {
+    const f = r.fields;
+    const cat = topicToWheelCategory(f.course_topic || '');
+    const name = f.course_name || '—';
+    const completion = f.completion_percentage || 0;
+    const totalSessions = (f.sessions_week_1||0) + (f.sessions_week_2||0) + (f.sessions_week_3||0) + (f.sessions_week_4||0);
+    const daysAgo = f.days_since_last_session;
+    // Score: 0–10 — based on completion + session activity
+    const score = Math.min(10, Math.round((completion / 10) + (totalSessions > 0 ? Math.min(2, totalSessions / 5) : 0)));
+    if (!wheel[cat].courses.includes(name)) wheel[cat].courses.push(name);
+    wheel[cat].score = Math.max(wheel[cat].score, score);
+    if (daysAgo != null) {
+      const d = new Date(Date.now() - daysAgo * 86400000).toISOString().split('T')[0];
+      if (!wheel[cat].last_engaged || d > wheel[cat].last_engaged) wheel[cat].last_engaged = d;
+    }
+  });
+  return wheel;
+}
+
+// ---- Compute engagement timeline (12 values) from Email_Engagement records ----
+function computeEngagementTimelineFromRecords(emailRecords) {
+  if (!emailRecords || emailRecords.length === 0) return Array(12).fill(0);
+  const sorted = [...emailRecords]
+    .sort((a, b) => (a.fields.month_number || 0) - (b.fields.month_number || 0))
+    .slice(-12);
+  const scores = sorted.map(r => Math.min(100, r.fields.open_rate_percent || 0));
+  while (scores.length < 12) scores.unshift(0);
+  return scores;
+}
+
+// ---- Render course timeline from actual Course_Behavior records ----
+function renderCourseTimeline(courseRecords) {
+  const el = document.getElementById('courseTimeline');
+  if (!el) return;
+  if (!courseRecords || courseRecords.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No course activity data available.</p>';
+    return;
+  }
+  // Sort by started_date_months_ago ascending (most recently started first = smallest number)
+  const sorted = [...courseRecords].sort((a, b) =>
+    (a.fields.started_date_months_ago || 999) - (b.fields.started_date_months_ago || 999)
+  );
+  el.innerHTML = sorted.map(r => {
+    const f = r.fields;
+    const name = f.course_name || '—';
+    const cat = topicToWheelCategory(f.course_topic || '');
+    const catColor = WHEEL_COLORS[cat] || 'var(--mv-orange)';
+    const pct = f.completion_percentage || 0;
+    const action = pct >= 90 ? 'Completed' : pct > 0 ? `In progress (${pct}%)` : 'Started';
+    const started = f.started_date_months_ago != null ? `${f.started_date_months_ago} month(s) ago` : '—';
+    const daysAgo = f.days_since_last_session;
+    const lastActive = daysAgo != null ? `last active ${daysAgo}d ago` : '';
+    const isActive = daysAgo != null && daysAgo < 30;
+    return `<div class="timeline-item">
+      <div class="timeline-dot ${isActive ? '' : 'inactive'}"></div>
+      <div class="timeline-content">
+        <strong style="display:block;color:var(--text-primary);font-size:13px;">${escHtml(name)}</strong>
+        <span>${escHtml(action)} · Started ${escHtml(started)}${lastActive ? ' · ' + escHtml(lastActive) : ''} · <span style="color:${catColor};font-weight:600;">${escHtml(cat)}</span></span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDevelopmentWheel(wheel) {
+  if (state.charts.wheel) { state.charts.wheel.destroy(); state.charts.wheel = null; }
+  const canvas = document.getElementById('wheelChart');
+  const legendEl = document.getElementById('wheelLegend');
+  const recentEl = document.getElementById('recentCourses');
+  if (!canvas || !wheel) return;
+
+  const scores = WHEEL_CATEGORIES.map(cat => (wheel[cat]?.score || 0));
+
+  // Determine category recency rank (by last_engaged date)
+  const ranked = WHEEL_CATEGORIES
+    .map(cat => ({ cat, date: wheel[cat]?.last_engaged || null }))
+    .filter(x => x.date)
+    .sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0));
+
+  const recentRank = {}; // cat → 0/1/2 (index into RECENT_COLORS)
+  ranked.slice(0, 3).forEach((x, i) => { recentRank[x.cat] = i; });
+
+  // Background colors per segment — highlight recently active
+  const pointColors = WHEEL_CATEGORIES.map(cat => {
+    if (recentRank[cat] !== undefined) return RECENT_COLORS[recentRank[cat]];
+    return WHEEL_COLORS[cat];
+  });
+
+  state.charts.wheel = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: WHEEL_CATEGORIES,
+      datasets: [{
+        data: scores,
+        backgroundColor: 'rgba(232,93,38,0.15)',
+        borderColor: '#E85D26',
+        borderWidth: 2,
+        pointBackgroundColor: pointColors,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 10,
+          ticks: { stepSize: 2, font: { size: 9 }, color: '#8890A8', backdropColor: 'transparent' },
+          grid: { color: '#E8ECF4' },
+          angleLines: { color: '#E8ECF4' },
+          pointLabels: { font: { size: 10, weight: '600' }, color: '#5A6380' }
+        }
+      }
+    }
+  });
+
+  // Legend — sorted by last_engaged (most recent first), inactive at bottom
+  const sortedCats = [...WHEEL_CATEGORIES].sort((a, b) => {
+    const da = wheel[a]?.last_engaged || '';
+    const db = wheel[b]?.last_engaged || '';
+    if (da && db) return da > db ? -1 : da < db ? 1 : 0;
+    if (da) return -1;
+    if (db) return 1;
+    return 0;
+  });
+
+  legendEl.innerHTML = `<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">
+    Score (0–10) = depth of engagement with content in this area.<br>
+    Coloured dots = 3 most recently active categories.
+  </div>`
+  + sortedCats.map(cat => {
+    const rank = recentRank[cat];
+    const dot = rank !== undefined ? RECENT_COLORS[rank] : WHEEL_COLORS[cat];
+    const score = wheel[cat]?.score || 0;
+    const lastDate = wheel[cat]?.last_engaged;
+    const dateStr = lastDate ? `· ${lastDate}` : '· no activity';
+    const rankLabel = rank !== undefined
+      ? `<span class="recent-badge" style="background:${RECENT_COLORS[rank]}22;color:${RECENT_COLORS[rank]};">${RECENT_LABELS[rank]}</span>` : '';
+    return `<div class="wheel-legend-item">
+      <div class="wheel-legend-dot" style="background:${dot};box-shadow:${rank !== undefined ? '0 0 0 2px ' + dot + '44' : 'none'};"></div>
+      <span style="font-weight:600;min-width:90px;">${cat}</span>
+      <span style="color:var(--text-muted);font-size:11px;">${score}/10 ${dateStr}</span>
+      ${rankLabel}
+    </div>`;
+  }).join('');
+
+  // Recent courses list (last 3 by date)
+  if (ranked.length) {
+    recentEl.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Last 3 Active Areas</div>'
+      + ranked.slice(0,3).map((x, i) => {
+          const courses = (wheel[x.cat]?.courses || []).slice(0,2).join(', ');
+          return `<div style="display:flex;gap:6px;margin-bottom:6px;align-items:flex-start;">
+            <div style="width:10px;height:10px;border-radius:50%;background:${RECENT_COLORS[i]};flex-shrink:0;margin-top:2px;"></div>
+            <div>
+              <div style="font-size:12px;font-weight:600;">${x.cat}</div>
+              <div style="font-size:11px;color:var(--text-muted);">${courses || '—'} · ${x.date}</div>
+            </div>
+          </div>`;
+        }).join('');
+  } else {
+    recentEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No recency data.</p>';
+  }
+}
+
+// ---- Course completion rate bars ----
+// ---- Email popover (click on bar) ----
+function showEmailPopover(event, monthIndex) {
+  event.stopPropagation();
+  const popover  = document.getElementById('emailPopover');
+  const list     = document.getElementById('emailPopoverList');
+  const weekLabel = document.getElementById('emailPopoverWeek');
+  const month    = state.emailByWeek && state.emailByWeek[monthIndex];
+
+  if (!month) return;
+
+  weekLabel.textContent = `${month.label} — ${month.openRate}% open · ${month.clickRate}% click`;
+
+  const extra = [];
+  if (month.topicsOpened)  extra.push(`<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Topics opened: <strong>${escHtml(month.topicsOpened)}</strong></div>`);
+  if (month.topicsIgnored) extra.push(`<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Topics ignored: ${escHtml(month.topicsIgnored)}</div>`);
+  if (month.converted && month.converted !== 'No') extra.push(`<div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:8px;">✓ Converted${month.offerType ? ': ' + escHtml(month.offerType) : ''}</div>`);
+
+  if (month.titles.length === 0) {
+    list.innerHTML = extra.join('') + '<p style="color:var(--text-muted);font-size:12px;">No email titles recorded for this month.</p>';
+  } else {
+    list.innerHTML = extra.join('')
+      + month.titles.map(t => `
+      <div class="email-popover-item">
+        <div class="email-action-dot" style="background:var(--mv-orange);"></div>
+        <div><div class="email-popover-subject">${escHtml(t)}</div></div>
+      </div>`).join('');
+  }
+
+  // Position near click
+  const rect = event.target.getBoundingClientRect();
+  const pw = 300;
+  let left = rect.left + rect.width / 2 - pw / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  popover.style.left = left + 'px';
+  popover.style.top = (rect.top - 8) + 'px';
+  popover.style.transform = 'translateY(-100%)';
+  popover.style.display = 'block';
+}
+
+// Close all popovers on outside click
+document.addEventListener('click', () => {
+  ['emailPopover','contentPopover'].forEach(id => {
+    const p = document.getElementById(id);
+    if (p) p.style.display = 'none';
+  });
+});
+
+// ---- EVE signals — real quotes + Airtable deep links ----
+function renderEveSignals(claudeSignals, eveRecords) {
+  const el = document.getElementById('eveSignals');
+  if (!el) return;
+
+  const eveTableId = state.tableIds['simulation'] || state.tableIds['eve_conversations']
+    || state.tableIds['EVE_Conversations'] || state.tableIds['EVE Conversations'] || '';
+
+  // Try to show actual quotes from EVE records
+  const quoted = eveRecords.filter(r => {
+    const f = r.fields;
+    return f.conversation_transcript || f.Message || f.message || f.Content || f.content || f.Text || f.text || f.Body || f.body || f.Notes || f.notes;
+  });
+
+  if (quoted.length > 0) {
+    el.innerHTML = quoted.map(r => {
+      const f = r.fields;
+      const msg = f.conversation_transcript || f.Message || f.message || f.Content || f.content || f.Text || f.text || f.Body || f.body || f.Notes || f.notes || '';
+      const date = f.Date || f.date || f.Created || f.created || f['Created At'] || '';
+      const dateStr = date ? new Date(date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '';
+      const recordUrl = eveTableId
+        ? `https://airtable.com/${state.baseId}/${eveTableId}/${r.id}`
+        : `https://airtable.com/${state.baseId}`;
+      const snippet = msg.length > 280 ? msg.substring(0, 280) + '…' : msg;
+      return `<blockquote class="eve-quote">
+        <p>${escHtml(snippet)}</p>
+        <cite>EVE Chat${dateStr ? ' · ' + dateStr : ''} · <a href="${recordUrl}" target="_blank" rel="noopener">View record ↗</a></cite>
+      </blockquote>`;
+    }).join('');
+  } else if (claudeSignals && claudeSignals.length > 0) {
+    // Fall back to Claude-extracted signals as plain bullets
+    el.innerHTML = claudeSignals.map(s =>
+      `<div style="display:flex;gap:8px;margin-bottom:6px;">
+        <span style="color:var(--mv-orange);font-weight:700;">•</span>
+        <span style="font-size:13px;color:var(--text-secondary);">${escHtml(s)}</span>
+      </div>`).join('');
+  } else {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No EVE conversation data available.</p>';
+  }
+}
+
+// Takes actual Airtable Course_Behavior records (r.fields)
+function renderCompletionBars(courseRecords) {
+  const el = document.getElementById('completionBars');
+  if (!el) return;
+  if (!courseRecords || courseRecords.length === 0) {
+    el.innerHTML = '<p style="color:var(--text-muted);font-size:12px;">No completion data.</p>';
+    return;
+  }
+  el.innerHTML = courseRecords.map(r => {
+    const f = r.fields;
+    const name  = f.course_name || f.course || '—';
+    const cat   = topicToWheelCategory(f.course_topic || '');
+    const color = WHEEL_COLORS[cat] || '#E85D26';
+    const pct   = Math.min(100, Math.max(0, f.completion_percentage || 0));
+    return `<div class="completion-row">
+      <span class="completion-name" title="${escHtml(name)}">${escHtml(name)}</span>
+      <span class="completion-cat" style="background:${color}22;color:${color};">${escHtml(cat)}</span>
+      <div class="completion-track">
+        <div class="completion-fill" style="width:${pct}%;background:${color};"></div>
+      </div>
+      <span class="completion-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// TONE / REGENERATE
+// ============================================================
+const TONE_INSTRUCTIONS = {
+  warm: 'Write in a warm, personal, empathetic tone — like a caring mentor checking in. Use the subscriber\'s name, acknowledge their specific journey, and express genuine care about their progress.',
+  direct: 'Write in a direct, practical, results-focused tone. No fluff. Lead with the specific value they\'re missing, and give them one clear action to take.',
+  vishen: 'Write in the style of Vishen Lakhiani — visionary, inspiring, slightly provocative. Use phrases like "extraordinary life", "upgraded human", "the 3 most important questions". Reference transformation, human potential, and the audacity to grow.',
+};
+
+async function setTone(tone, btn) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.currentTone = tone;
+
+  if (state.toneMessages[tone]) {
+    document.getElementById('messageBox').value = state.toneMessages[tone];
+    return;
+  }
+
+  if (!state.currentAnalysis) return;
+  const { customer, result } = state.currentAnalysis;
+
+  // Lightweight dedicated call — no full JSON re-analysis
+  const msgBtn = document.getElementById('messageBox');
+  msgBtn.value = '✍️  Writing message...';
+  btn.disabled = true;
+
+  try {
+    const name = getCustomerName(customer);
+    const channel = result.drafted_message?.channel || 'Email';
+    const prompt = `You are a Mindvalley retention specialist. Write a ${channel} message to re-engage this subscriber.
+
+Subscriber: ${name}
+Engagement stage: ${result.engagement_stage}
+Primary barrier: ${result.primary_barrier}
+Recommended intervention: ${result.intervention_stage}
+Key context: ${result.barrier_detail || ''}
+
+Tone instruction: ${TONE_INSTRUCTIONS[tone]}
+
+Write ONLY the message body. No subject line, no JSON, no labels — just the message text itself, ready to send. 2-4 short paragraphs.`;
+
+    const sys = 'You write personalized retention messages for Mindvalley subscribers. Return only the message body text, nothing else.';
+    const msg = await callClaude(prompt, sys, 600);
+    state.toneMessages[tone] = msg.trim();
+    document.getElementById('messageBox').value = state.toneMessages[tone];
+    log(`Message rewritten in "${tone}" tone.`, 'ok');
+  } catch(e) {
+    document.getElementById('messageBox').value = state.toneMessages.warm || '';
+    log(`Tone rewrite failed: ${e.message}`, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function regenerateMessage() {
+  if (!state.currentAnalysis) return;
+  const tone = state.currentTone;
+  state.toneMessages[tone] = ''; // force fresh generation
+  const btn = document.querySelector('.tone-btn.active');
+  if (btn) await setTone(tone, btn);
+}
+
+// ============================================================
+// SAVE TO AIRTABLE
+// ============================================================
+async function saveToAirtable() {
+  if (!state.currentAnalysis) { log('No analysis to save.', 'err'); return; }
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    const { customerId, customer, result } = state.currentAnalysis;
+    const message = document.getElementById('messageBox').value;
+    await saveResultToAirtable(customerId, customer, result, customer.Name, message);
+    log('Saved to Airtable.', 'ok');
+    btn.textContent = '✓ Saved';
+    setTimeout(() => { btn.textContent = 'Save to Airtable'; btn.disabled = false; }, 2000);
+  } catch(e) {
+    log(`Save failed: ${e.message}`, 'err');
+    btn.textContent = 'Save to Airtable';
+    btn.disabled = false;
+  }
+}
+
+async function saveResultToAirtable(customerId, customerFields, result, customerName, customMessage) {
+  const name = customerName || customerFields.Name || customerId;
+  const action = result.recommended_action || {};
+  const msg = customMessage || result.drafted_message?.body || '';
+
+  const fields = {
+    Customer_Name: name,
+    Analysis_Date: new Date().toISOString().split('T')[0],
+    Churn_Probability: result.churn_probability || 0,
+    Engagement_Stage: result.engagement_stage || '',
+    Intervention_Stage: result.intervention_stage || '',
+    Primary_Barrier: result.primary_barrier || '',
+    Barrier_Confidence: result.barrier_confidence || 0,
+    Recommended_Action: action.title || '',
+    Action_Type: action.type || '',
+    Action_Channel: action.channel || '',
+    Action_Priority: action.priority || '',
+    Drafted_Message: msg,
+    Message_Channel: result.drafted_message?.channel || '',
+    Profile_Summary: result.profile_summary || '',
+    Success_Metrics: result.success_metrics || '',
+    Followup_Schedule: result.followup_schedule || '',
+    Raw_JSON: JSON.stringify(result),
+  };
+
+  // Link to customer if we have a record ID
+  if (customerId) {
+    fields.Customer = [customerId];
+  }
+
+  await airtableCreate(TABLES.agentOutputs, fields);
+}
+
+// ============================================================
+// SETUP MODAL
+// ============================================================
+function resetCredentials() {
+  localStorage.removeItem('mv_airtable_token');
+  localStorage.removeItem('mv_base_id');
+  localStorage.removeItem('mv_anthropic_key');
+  document.getElementById('setupAirtableToken').value = '';
+  document.getElementById('setupBaseId').value = '';
+  document.getElementById('setupAnthropicKey').value = '';
+  document.getElementById('setupModal').style.display = 'flex';
+}
+
+function saveSetup() {
+  const token = document.getElementById('setupAirtableToken').value.trim();
+  const base  = document.getElementById('setupBaseId').value.trim();
+  const key   = document.getElementById('setupAnthropicKey').value.trim();
+  const errEl = document.getElementById('setupError');
+  if (!token || !base || !key) {
+    errEl.textContent = 'All three fields are required.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem('mv_airtable_token', token);
+  localStorage.setItem('mv_base_id', base);
+  localStorage.setItem('mv_anthropic_key', key);
+  state.airtableToken = token;
+  state.baseId = base;
+  state.anthropicKey = key;
+  document.getElementById('setupModal').style.display = 'none';
+  log('Credentials saved. Connecting...', 'info');
+  connectAndLoad();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  // Load credentials from localStorage
+  state.airtableToken = localStorage.getItem('mv_airtable_token') || '';
+  state.baseId        = localStorage.getItem('mv_base_id') || '';
+  state.anthropicKey  = localStorage.getItem('mv_anthropic_key') || '';
+
+  if (state.airtableToken && state.baseId && state.anthropicKey) {
+    log('Credentials loaded. Connecting...', 'info');
+    connectAndLoad();
+  } else {
+    // Show setup modal
+    document.getElementById('connectingBadge').style.display = 'none';
+    document.getElementById('setupModal').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
