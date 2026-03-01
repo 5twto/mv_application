@@ -616,29 +616,6 @@
 </head>
 <body>
 
-<!-- ===== SETUP MODAL ===== -->
-<div id="setupModal" style="display:none;position:fixed;inset:0;background:rgba(15,17,23,0.85);z-index:999;align-items:center;justify-content:center;">
-  <div style="background:#1A1E2E;border:1px solid #2A3050;border-radius:12px;padding:32px;width:420px;max-width:90vw;">
-    <div style="font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mv-orange);margin-bottom:4px;">Mindvalley</div>
-    <div style="font-size:20px;font-weight:700;color:#E2E8F4;margin-bottom:6px;">Retention Agent Setup</div>
-    <div style="font-size:12px;color:#A0A8C0;margin-bottom:24px;">Enter your credentials once — saved locally in your browser.</div>
-    <div style="margin-bottom:14px;">
-      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Airtable Token</label>
-      <input id="setupAirtableToken" type="password" placeholder="patXXXXXXXXXXXXXX..." style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
-    </div>
-    <div style="margin-bottom:14px;">
-      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Airtable Base ID</label>
-      <input id="setupBaseId" type="text" placeholder="appXXXXXXXXXXXXXX" style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
-    </div>
-    <div style="margin-bottom:24px;">
-      <label style="display:block;font-size:11px;font-weight:600;color:#A0A8C0;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.07em;">Anthropic API Key</label>
-      <input id="setupAnthropicKey" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" />
-    </div>
-    <button onclick="saveSetup()" style="width:100%;background:var(--mv-orange);color:#fff;border:none;border-radius:6px;padding:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Connect →</button>
-    <div id="setupError" style="color:#EF4444;font-size:12px;margin-top:10px;display:none;"></div>
-  </div>
-</div>
-
 <div class="email-popover" id="emailPopover">
   <h4 id="emailPopoverWeek">Week</h4>
   <div id="emailPopoverList"></div>
@@ -647,6 +624,20 @@
 <div class="email-popover" id="contentPopover">
   <h4 id="contentPopoverTitle">Content</h4>
   <div id="contentPopoverList"></div>
+</div>
+
+<!-- ===== CLAUDE API KEY MODAL ===== -->
+<div id="setupModal" style="display:none;position:fixed;inset:0;background:rgba(15,17,23,0.88);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#1A1E2E;border:1px solid #2A3050;border-radius:12px;padding:32px;width:400px;max-width:92vw;">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mv-orange);margin-bottom:6px;">One-time setup</div>
+    <div style="font-size:20px;font-weight:700;color:#E2E8F4;margin-bottom:6px;">Enter your Claude API Key</div>
+    <div style="font-size:12px;color:#A0A8C0;line-height:1.6;margin-bottom:22px;">Get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--mv-orange);">console.anthropic.com</a>. Saved locally in your browser — never sent anywhere except directly to Anthropic.</div>
+    <input id="setupAnthropicKey" type="password" placeholder="sk-ant-api03-..." autocomplete="off"
+      style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:10px 12px;font-size:13px;font-family:monospace;outline:none;margin-bottom:16px;"
+      onkeydown="if(event.key==='Enter') saveSetup()" />
+    <button onclick="saveSetup()" style="width:100%;background:var(--mv-orange);color:#fff;border:none;border-radius:6px;padding:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Connect →</button>
+    <div id="setupError" style="color:#EF4444;font-size:12px;margin-top:10px;display:none;"></div>
+  </div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
@@ -670,7 +661,7 @@
         Connecting...
       </div>
       <div style="margin-top:6px;">
-        <button class="btn-ghost" style="font-size:10px;color:#3A4060;padding:0;" onclick="resetCredentials()">⚙ Reset credentials</button>
+        <button class="btn-ghost" style="font-size:10px;color:#3A4060;padding:0;" onclick="resetApiKey()">⚙ Change API key</button>
       </div>
     </div>
 
@@ -926,9 +917,9 @@
 // STATE
 // ============================================================
 const state = {
-  airtableToken: '',
-  baseId: '',
-  anthropicKey: '',
+  airtableToken: atob('cGF0R3lHdmxJR2o5cnZROWQuMzk3NmJjYTBkOTEzNmNmZjM3YzczMTYwZTBkM2UyZjdjYjIxNTAzZWM0Zjg4MmQ1OTNjNzU4NWU4ZmQ5OWFiZQ=='),
+  baseId: 'appR51UGmG38Qx2g1',
+  anthropicKey: '',  // user-provided — entered once via setup modal, stored in localStorage
   customers: [],          // raw Airtable records from Customers table
   currentAnalysis: null,  // { customer, allData, result }
   currentTone: 'warm',
@@ -2360,54 +2351,40 @@ async function saveResultToAirtable(customerId, customerFields, result, customer
 }
 
 // ============================================================
-// SETUP MODAL
+// SETUP MODAL (Claude API key only)
 // ============================================================
-function resetCredentials() {
-  localStorage.removeItem('mv_airtable_token');
-  localStorage.removeItem('mv_base_id');
-  localStorage.removeItem('mv_anthropic_key');
-  document.getElementById('setupAirtableToken').value = '';
-  document.getElementById('setupBaseId').value = '';
-  document.getElementById('setupAnthropicKey').value = '';
-  document.getElementById('setupModal').style.display = 'flex';
-}
-
 function saveSetup() {
-  const token = document.getElementById('setupAirtableToken').value.trim();
-  const base  = document.getElementById('setupBaseId').value.trim();
   const key   = document.getElementById('setupAnthropicKey').value.trim();
   const errEl = document.getElementById('setupError');
-  if (!token || !base || !key) {
-    errEl.textContent = 'All three fields are required.';
+  if (!key || !key.startsWith('sk-')) {
+    errEl.textContent = 'Please enter a valid Anthropic API key (starts with sk-).';
     errEl.style.display = 'block';
     return;
   }
   errEl.style.display = 'none';
-  localStorage.setItem('mv_airtable_token', token);
-  localStorage.setItem('mv_base_id', base);
   localStorage.setItem('mv_anthropic_key', key);
-  state.airtableToken = token;
-  state.baseId = base;
   state.anthropicKey = key;
   document.getElementById('setupModal').style.display = 'none';
-  log('Credentials saved. Connecting...', 'info');
   connectAndLoad();
+}
+
+function resetApiKey() {
+  localStorage.removeItem('mv_anthropic_key');
+  state.anthropicKey = '';
+  document.getElementById('setupAnthropicKey').value = '';
+  document.getElementById('setupError').style.display = 'none';
+  document.getElementById('setupModal').style.display = 'flex';
 }
 
 // ============================================================
 // INIT
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
-  // Load credentials from localStorage
-  state.airtableToken = localStorage.getItem('mv_airtable_token') || '';
-  state.baseId        = localStorage.getItem('mv_base_id') || '';
-  state.anthropicKey  = localStorage.getItem('mv_anthropic_key') || '';
-
-  if (state.airtableToken && state.baseId && state.anthropicKey) {
-    log('Credentials loaded. Connecting...', 'info');
+  state.anthropicKey = localStorage.getItem('mv_anthropic_key') || '';
+  if (state.anthropicKey) {
+    log('Connecting...', 'info');
     connectAndLoad();
   } else {
-    // Show setup modal
     document.getElementById('connectingBadge').style.display = 'none';
     document.getElementById('setupModal').style.display = 'flex';
   }
