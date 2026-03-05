@@ -13,18 +13,15 @@
     --bg: #0F1117;
     --bg-card: #141720;
     --border: #1E2130;
-    --text: #E2E8F4;
+    --text: #D0D8EE;
     --text-muted: #5A6380;
     --text-sub: #8890A8;
   }
-  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 15px; line-height: 1.7; }
 
-  .page { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  .page { max-width: 780px; margin: 0 auto; padding: 0 24px 80px; }
 
-  .header {
-    padding: 52px 0 40px;
-    text-align: center;
-  }
+  .nav { padding: 28px 0 0; }
   .back {
     display: inline-flex;
     align-items: center;
@@ -33,7 +30,6 @@
     font-weight: 500;
     color: var(--text-sub);
     text-decoration: none;
-    margin-bottom: 28px;
     border: 1px solid var(--border);
     padding: 6px 12px;
     border-radius: 6px;
@@ -41,6 +37,11 @@
   }
   .back:hover { border-color: var(--orange); color: var(--orange); }
 
+  .header {
+    padding: 44px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
   .label {
     font-size: 11px;
     font-weight: 700;
@@ -54,42 +55,52 @@
     font-weight: 700;
     letter-spacing: -0.01em;
     color: #fff;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
-  .sub {
-    font-size: 15px;
+  .intro { font-size: 15px; color: var(--text-sub); max-width: 600px; }
+
+  /* ── ENTRY ── */
+  .entry { margin-bottom: 56px; }
+  .entry-header { margin-bottom: 16px; }
+  .entry-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 6px;
+  }
+  .entry-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .entry-desc {
+    font-size: 13px;
     color: var(--text-sub);
+    line-height: 1.65;
+    max-width: 580px;
   }
 
-  .screenshots {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    padding-bottom: 64px;
-  }
   .screenshot-wrap {
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
     background: var(--bg-card);
+    margin-top: 14px;
   }
-  .screenshot-wrap img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .screenshot-caption {
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
-    font-weight: 500;
-  }
+  .screenshot-wrap img { display: block; width: 100%; height: auto; }
 
-  .run-row {
+  .divider { border: none; border-top: 1px solid var(--border); margin-bottom: 56px; }
+
+  /* ── CTA ── */
+  .cta {
     text-align: center;
-    padding: 8px 0 48px;
+    padding-top: 12px;
   }
+  .cta p { font-size: 14px; color: var(--text-sub); margin-bottom: 18px; }
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -104,42 +115,78 @@
     transition: background 0.15s;
   }
   .btn-primary:hover { background: #FF7A45; }
-
-  @media (max-width: 600px) {
-    .header { padding: 36px 0 28px; }
-  }
 </style>
 </head>
 <body>
 <div class="page">
 
+  <nav class="nav">
+    <a href="https://5twto.github.io/mv_application/index.html" class="back">← Back</a>
+  </nav>
+
   <div class="header">
-    <div><a href="https://5twto.github.io/mv_application/index.html" class="back">← Back</a></div>
     <div class="label">Signal to Vishen — Output</div>
-    <h1>What it looks like</h1>
-    <p class="sub">Live output from a real analysis run</p>
+    <h1>What the output looks like</h1>
+    <p class="intro">Four screens from a live analysis run. The agent reads from Airtable, clusters signals with Claude, and delivers everything below in one session.</p>
   </div>
 
-  <div class="screenshots">
-
+  <!-- 1 -->
+  <div class="entry">
+    <div class="entry-header">
+      <div class="entry-num">01</div>
+      <div class="entry-title">Recurring churn themes</div>
+      <p class="entry-desc">Claude groups all recent subscriber diagnoses into 3–5 named patterns. Each card shows subscriber count, average churn risk, root cause, and what the product or content team could do about it.</p>
+    </div>
     <div class="screenshot-wrap">
       <img src="./screenshots/screenshot_1.png" alt="Recurring churn themes clustered across subscriber base" />
-      <div class="screenshot-caption">Recurring churn themes — clustered across subscriber base</div>
     </div>
-
-    <div class="screenshot-wrap">
-      <img src="./screenshots/screenshot_2.png" alt="Weekly brief — WhatsApp-ready output" />
-      <div class="screenshot-caption">Weekly brief — WhatsApp-ready output</div>
-    </div>
-
-    <div class="screenshot-wrap">
-      <img src="./screenshots/screenshot_3.png" alt="Theme detail — root cause and content opportunity" />
-      <div class="screenshot-caption">Theme detail — root cause and content opportunity</div>
-    </div>
-
   </div>
 
-  <div class="run-row">
+  <hr class="divider" />
+
+  <!-- 2 -->
+  <div class="entry">
+    <div class="entry-header">
+      <div class="entry-num">02</div>
+      <div class="entry-title">Theme detail — root cause and opportunities</div>
+      <p class="entry-desc">Expanding a theme reveals representative quotes pulled verbatim from individual subscriber diagnoses, plus specific content and product opportunities tied to that cluster.</p>
+    </div>
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_2.png" alt="Theme detail — root cause and content opportunity" />
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- 3 -->
+  <div class="entry">
+    <div class="entry-header">
+      <div class="entry-num">03</div>
+      <div class="entry-title">Weekly brief for Vishen</div>
+      <p class="entry-desc">A second Claude pass synthesises the themes into a founder-level brief — headline, 3–5 sentence summary, and a newsletter hook + concrete action for each theme. Written to be acted on, not read and archived.</p>
+    </div>
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_3.png" alt="Weekly brief — founder summary and actions" />
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- 4 -->
+  <div class="entry">
+    <div class="entry-header">
+      <div class="entry-num">04</div>
+      <div class="entry-title">WhatsApp-ready output</div>
+      <p class="entry-desc">The brief is formatted as a short WhatsApp message — bullet points, real numbers, one closing question. One click copies it. Another sends it directly via WhatsApp or email.</p>
+    </div>
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_4.png" alt="WhatsApp-ready brief output" />
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <p>Takes about 30 seconds to run on your own data.</p>
     <a href="https://5twto.github.io/mv_application/signal_to_vishen.html" class="btn-primary">Run it yourself →</a>
   </div>
 

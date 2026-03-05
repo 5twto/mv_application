@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Retention Intelligence Agent — What it is</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #E85D26;
+    --bg: #0F1117;
+    --bg-card: #141720;
+    --border: #1E2130;
+    --text: #D0D8EE;
+    --text-muted: #5A6380;
+    --text-sub: #8890A8;
+    --green: #22C55E;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── NAV ── */
+  .nav {
+    padding: 28px 0 0;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .back:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 44px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 14px;
+    line-height: 1.15;
+  }
+  .intro {
+    font-size: 16px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    max-width: 640px;
+  }
+  .note {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(234,179,8,0.08);
+    border: 1px solid rgba(234,179,8,0.2);
+    color: #EAB308;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    margin-top: 16px;
+  }
+
+  /* ── BODY CONTENT ── */
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin: 44px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  ol { padding-left: 20px; margin-bottom: 14px; }
+  ol li {
+    margin-bottom: 10px;
+    color: var(--text);
+    padding-left: 4px;
+  }
+  ol li strong { color: #fff; font-weight: 600; }
+
+  /* ── STEP CARDS ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--orange);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-text { font-size: 14px; color: var(--text); line-height: 1.55; }
+  .step-text strong { color: #fff; font-weight: 600; }
+
+  /* ── SETUP ── */
+  .setup-steps {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 8px;
+  }
+  .setup-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .setup-step:last-child { border-bottom: none; padding-bottom: 0; }
+  .setup-num {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    background: rgba(232,93,38,0.15);
+    color: var(--orange);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .setup-text { color: var(--text); line-height: 1.5; }
+  .setup-text a { color: var(--orange); text-decoration: none; }
+  .setup-text a:hover { text-decoration: underline; }
+
+  .info-box {
+    background: rgba(34,197,94,0.06);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #86EFAC;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-sub);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  code {
+    background: #1A1E2E;
+    color: var(--orange);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  /* ── STACK ── */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .stack-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .stack-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px; }
+  .stack-value { font-size: 13px; color: var(--text); }
+
+  /* ── SCREENSHOTS ── */
+  .screenshot-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-card);
+    margin-bottom: 16px;
+  }
+  .screenshot-wrap img { display: block; width: 100%; height: auto; }
+  .screenshot-caption {
+    padding: 9px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  /* ── CTA ── */
+  .cta {
+    text-align: center;
+    padding: 48px 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  .cta p { font-size: 14px; color: var(--text-sub); margin-bottom: 18px; }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--orange);
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #FF7A45; }
+
+  @media (max-width: 600px) {
+    .stack-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="nav">
+    <a href="https://5twto.github.io/mv_application/index.html" class="back">← Back</a>
+  </nav>
+
+  <div class="header">
+    <div class="label">Mindvalley · Founder Apprentice Application</div>
+    <h1>Retention Intelligence Agent</h1>
+    <p class="intro">A single-file, browser-based AI tool that analyses subscriber engagement data and generates personalised retention interventions. Built on Airtable + Claude AI. No backend, no build step — open the HTML file and go.</p>
+    <div class="note">⚠ The data shown in screenshots is fully simulated.</div>
+  </div>
+
+  <!-- WHAT IT DOES -->
+  <h2>What it does</h2>
+  <p>For each subscriber, the agent:</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Pulls data</strong> from four Airtable tables — customer profile, course behaviour, email engagement, and AI conversation history</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Analyses</strong> the subscriber via Claude — diagnosing their engagement stage, primary churn barrier, and latent interests</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Renders</strong> a full behavioural profile with charts, signals, and reasoning</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Drafts</strong> a personalised re-engagement message in three tone styles</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Recommends</strong> a concrete retention action with channel, trigger, timing, and success metrics</div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Saves</strong> outputs back to Airtable for team review</div></div>
+  </div>
+
+  <!-- SETUP -->
+  <h2>Setup</h2>
+  <p>The Airtable database connection is pre-configured. The only thing you need to provide is your own Anthropic API key:</p>
+  <div class="setup-steps">
+    <div class="setup-step"><div class="setup-num">1</div><div class="setup-text">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div></div>
+    <div class="setup-step"><div class="setup-num">2</div><div class="setup-text">Download <code>retention_agent.html</code></div></div>
+    <div class="setup-step"><div class="setup-num">3</div><div class="setup-text">Open it in any modern browser</div></div>
+    <div class="setup-step"><div class="setup-num">4</div><div class="setup-text">Paste your API key into the prompt on first launch</div></div>
+  </div>
+  <div class="info-box">Your key is saved to browser localStorage — you only enter it once. To change it later, use the ⚙ Change API key link in the sidebar.</div>
+
+  <!-- AIRTABLE SCHEMA -->
+  <h2>Airtable schema</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Table</th><th>Key fields</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Customers</code></td><td>customer_id, name, archetype, engagement_stage, churn_probability, months_as_member</td></tr>
+        <tr><td><code>Course_Behavior</code></td><td>customer_id, course_name, course_topic, completion_percentage, sessions_week_1–4, days_since_last_session</td></tr>
+        <tr><td><code>Email_Engagement</code></td><td>customer_id, month_number, emails_received, open_rate_percent, click_rate_percent, email_titles_interacted</td></tr>
+        <tr><td><code>simulation</code></td><td>customer_id, conversation_transcript</td></tr>
+        <tr><td><code>Agent_Outputs</code></td><td>Created automatically on first save</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STACK -->
+  <h2>Stack</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-label">Frontend</div><div class="stack-value">Vanilla HTML/CSS/JS — no framework, no build step</div></div>
+    <div class="stack-item"><div class="stack-label">AI</div><div class="stack-value">Claude Opus 4 via Anthropic API (direct browser access)</div></div>
+    <div class="stack-item"><div class="stack-label">Data</div><div class="stack-value">Airtable REST API</div></div>
+    <div class="stack-item"><div class="stack-label">Charts</div><div class="stack-value">Chart.js 4.4</div></div>
+  </div>
+
+  <!-- SCREENSHOTS -->
+  <h2>Screenshots</h2>
+
+  <div class="screenshot-wrap">
+    <img src="./screenshots/01-sidebar.png" alt="Sidebar — subscriber selector with archetype filters" />
+    <div class="screenshot-caption">Sidebar — subscriber selector with archetype filters</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/02-profile-overview.png" alt="Profile tab — churn risk, acquisition story, behavioural summary" />
+    <div class="screenshot-caption">Profile tab — churn risk, acquisition story, behavioural summary</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/03-email-eve-signals.png" alt="Email engagement + EVE conversation signals" />
+    <div class="screenshot-caption">Email engagement + EVE conversation signals</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/04-engagement-content.png" alt="Engagement score over time + content interaction breakdown" />
+    <div class="screenshot-caption">Engagement score over time + content interaction breakdown</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/05-development-wheel.png" alt="Development wheel + course completion rates" />
+    <div class="screenshot-caption">Development wheel + course completion rates</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/06-course-timeline.png" alt="Course activity timeline + AI profile summary" />
+    <div class="screenshot-caption">Course activity timeline + AI profile summary</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/07-intervention.png" alt="Intervention tab — barrier diagnosis + drafted message" />
+    <div class="screenshot-caption">Intervention tab — barrier diagnosis + drafted message (Warm, Direct, or Vishen Voice tone)</div>
+  </div>
+  <div class="screenshot-wrap">
+    <img src="./screenshots/08-action.png" alt="Action tab — recommended action plan" />
+    <div class="screenshot-caption">Action tab — recommended action plan with channel, timing, and success metrics</div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <p>Want the full picture? Signal to Vishen takes this further — patterns across the whole subscriber base.</p>
+    <a href="https://5twto.github.io/mv_application/index.html" class="btn-primary">Back to Signal to Vishen →</a>
+  </div>
+
+</div>
+</body>
+</html>
