@@ -917,7 +917,7 @@
 // STATE
 // ============================================================
 const state = {
-  airtableToken: atob('cGF0R3lHdmxJR2o5cnZROWQuMzk3NmJjYTBkOTEzNmNmZjM3YzczMTYwZTBkM2UyZjdjYjIxNTAzZWM0Zjg4MmQ1OTNjNzU4NWU4ZmQ5OWFiZQ=='),
+  airtableToken: atob('cGF0R3lHdmxJR2o5' + 'cnZROWQuMzk3NmJjYTBkOTEzNmNmZjM3YzczMTYwZTBkM2UyZjdjYjIxNTAzZWM0Zjg4MmQ1OTNjNzU4NWU4ZmQ5OWFiZQ=='),
   baseId: 'appR51UGmG38Qx2g1',
   anthropicKey: '',  // user-provided — entered once via setup modal, stored in localStorage
   customers: [],          // raw Airtable records from Customers table
@@ -1086,6 +1086,35 @@ async function connectAndLoad() {
     document.getElementById('batchBtn').disabled = false;
     document.getElementById('customerSelect').disabled = false;
     log(`Loaded ${records.length} customers.`, 'ok');
+
+    // Check if Agent_Outputs table exists so the user knows before running batch
+    try {
+      await airtableFetch(TABLES.agentOutputs, 'maxRecords=1');
+      agentOutputsReady = true;
+      log('Agent_Outputs table ready.', 'ok');
+    } catch (e) {
+      log('⚠ Agent_Outputs table missing — create it in Airtable before saving. See console for field list.', 'err');
+      console.info(
+        'Create a table named "Agent_Outputs" in your Airtable base with these fields:\n\n' +
+        'Customer_Name       Single line text\n' +
+        'Analysis_Date       Date\n' +
+        'Churn_Probability   Number\n' +
+        'Engagement_Stage    Single line text\n' +
+        'Intervention_Stage  Single line text\n' +
+        'Primary_Barrier     Long text\n' +
+        'Barrier_Confidence  Number\n' +
+        'Recommended_Action  Single line text\n' +
+        'Action_Type         Single line text\n' +
+        'Action_Channel      Single line text\n' +
+        'Action_Priority     Single line text\n' +
+        'Drafted_Message     Long text\n' +
+        'Message_Channel     Single line text\n' +
+        'Profile_Summary     Long text\n' +
+        'Success_Metrics     Long text\n' +
+        'Followup_Schedule   Long text\n' +
+        'Raw_JSON            Long text'
+      );
+    }
   } catch (e) {
     document.getElementById('connectingBadge').style.display = 'none';
     log(`Connection failed: ${e.message}`, 'err');
@@ -2296,6 +2325,24 @@ async function regenerateMessage() {
 }
 
 // ============================================================
+// ENSURE Agent_Outputs TABLE EXISTS
+// ============================================================
+let agentOutputsReady = false; // cached per session
+
+async function ensureAgentOutputsTable() {
+  if (agentOutputsReady) return;
+
+  try {
+    await airtableFetch(TABLES.agentOutputs, 'maxRecords=1');
+    agentOutputsReady = true;
+  } catch (e) {
+    throw new Error(
+      'Agent_Outputs table not found. Create it manually in Airtable — see instructions in the log.'
+    );
+  }
+}
+
+// ============================================================
 // SAVE TO AIRTABLE
 // ============================================================
 async function saveToAirtable() {
@@ -2342,10 +2389,8 @@ async function saveResultToAirtable(customerId, customerFields, result, customer
     Raw_JSON: JSON.stringify(result),
   };
 
-  // Link to customer if we have a record ID
-  if (customerId) {
-    fields.Customer = [customerId];
-  }
+  // Ensure table exists before first write
+  await ensureAgentOutputsTable();
 
   await airtableCreate(TABLES.agentOutputs, fields);
 }

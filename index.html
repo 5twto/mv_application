@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal to Vishen — Mindvalley Retention Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #E85D26;
+    --orange-light: #FF7A45;
+    --orange-dim: rgba(232,93,38,0.12);
+    --bg: #0F1117;
+    --bg-card: #141720;
+    --border: #1E2130;
+    --text: #E2E8F4;
+    --text-muted: #5A6380;
+    --text-sub: #8890A8;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100%;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 72px 0 64px;
+    text-align: center;
+  }
+
+  .label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 22px;
+  }
+
+  .headline {
+    font-size: clamp(42px, 8vw, 68px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .subheadline {
+    font-size: clamp(16px, 2.5vw, 19px);
+    font-weight: 400;
+    color: var(--text-sub);
+    max-width: 600px;
+    margin: 0 auto 36px;
+    line-height: 1.65;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--orange);
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 26px;
+    border-radius: 8px;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--orange-light); }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 26px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .section {
+    padding: 64px 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--orange);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: -0.01em;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .step-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+
+  /* ── SCREENSHOTS ── */
+  .screenshots {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .screenshot-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-card);
+  }
+
+  .screenshot-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .screenshot-caption {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    padding: 36px 0 48px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header { padding: 48px 0 44px; }
+    .steps { grid-template-columns: 1fr; }
+    .cta-row { flex-direction: column; align-items: center; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+    .section { padding: 44px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="label">Mindvalley · Founder Apprentice Application</div>
+    <h1 class="headline">Signal to Vishen</h1>
+    <p class="subheadline">The retention agent submitted tells you who is at risk. This tells you why — across the board — and delivers a brief you can act on directly.</p>
+    <div class="cta-row">
+      <a href="https://5twto.github.io/mv_application/mv_app/signal_to_vishen.html" class="btn-primary">Run it yourself →</a>
+      <a href="https://5twto.github.io/mv_application/mv_app/retention_agent.html" class="btn-secondary">See the retention agent →</a>
+    </div>
+  </header>
+
+  <hr class="divider" />
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="section">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Three steps. One brief.</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon">🔍</span>
+        <div class="step-title">Reads</div>
+        <p class="step-desc">Pulls all recent subscriber analyses from the retention agent's Airtable output.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon">🧩</span>
+        <div class="step-title">Clusters</div>
+        <p class="step-desc">Groups churn signals into 3–5 recurring themes using Claude AI.</p>
+      </div>
+      <div class="step">
+        <span class="step-icon">📲</span>
+        <div class="step-title">Delivers</div>
+        <p class="step-desc">Generates a founder brief, ready to send via WhatsApp or email.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ── SCREENSHOTS ── -->
+  <section class="section">
+    <div class="section-label">Output</div>
+    <h2 class="section-title">What it looks like</h2>
+    <div class="screenshots">
+
+      <div class="screenshot-wrap">
+        <img src="./screenshots/screenshot_1.png" alt="Recurring churn themes clustered across subscriber base" />
+        <div class="screenshot-caption">Recurring churn themes — clustered across subscriber base</div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <img src="./screenshots/screenshot_2.png" alt="Weekly brief — WhatsApp-ready output" />
+        <div class="screenshot-caption">Weekly brief — WhatsApp-ready output</div>
+      </div>
+
+      <div class="screenshot-wrap">
+        <img src="./screenshots/screenshot_3.png" alt="Theme detail — root cause and content opportunity" />
+        <div class="screenshot-caption">Theme detail — root cause and content opportunity</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    Built by Yael Gpunitski &nbsp;·&nbsp; Founder Apprentice Application &nbsp;·&nbsp; Mindvalley 2026
+  </footer>
+
+</div>
+
+</body>
+</html>

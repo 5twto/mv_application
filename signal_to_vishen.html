@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal to Vishen — Mindvalley</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --mv-orange: #E85D26;
+    --mv-orange-light: #FF7A45;
+    --mv-orange-dim: rgba(232,93,38,0.12);
+    --sidebar-bg: #0F1117;
+    --sidebar-border: #1E2130;
+    --sidebar-text: #A0A8C0;
+    --sidebar-heading: #E2E8F4;
+    --main-bg: #F8F9FC;
+    --card-bg: #FFFFFF;
+    --card-border: #E8ECF4;
+    --text-primary: #0F1117;
+    --text-secondary: #5A6380;
+    --text-muted: #8890A8;
+    --green: #22C55E;
+    --yellow: #EAB308;
+    --amber: #F97316;
+    --red: #EF4444;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 24px rgba(0,0,0,0.10);
+  }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, sans-serif; background: var(--main-bg); color: var(--text-primary); font-size: 14px; line-height: 1.5; }
+
+  /* ===== LAYOUT ===== */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--sidebar-border);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .sidebar-logo h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mv-orange);
+  }
+  .sidebar-logo p { font-size: 11px; color: var(--sidebar-text); margin-top: 2px; }
+
+  .sidebar-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--sidebar-text);
+    margin-bottom: 10px;
+  }
+
+  .field-group { margin-bottom: 10px; }
+  .field-group label { display: block; font-size: 11px; font-weight: 500; color: var(--sidebar-text); margin-bottom: 4px; }
+  .field-group select {
+    width: 100%;
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-heading);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23A0A8C0'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+  .field-group select:focus { border-color: var(--mv-orange); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    padding: 8px 14px;
+  }
+  .btn-primary { background: var(--mv-orange); color: #fff; width: 100%; }
+  .btn-primary:hover { background: var(--mv-orange-light); }
+  .btn-primary:disabled { background: #3A4060; color: #5A6080; cursor: not-allowed; }
+  .btn-secondary {
+    background: #1A1E2E;
+    color: var(--sidebar-heading);
+    border: 1px solid #2A3050;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .btn-secondary:hover { border-color: var(--mv-orange); color: var(--mv-orange); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--sidebar-text);
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .btn-ghost:hover { color: var(--sidebar-heading); }
+
+  .connected-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(34,197,94,0.12);
+    color: var(--green);
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .connected-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* Status log */
+  .status-log {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--sidebar-border);
+    font-size: 11px;
+    color: var(--sidebar-text);
+    min-height: 80px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .status-log p { margin-bottom: 4px; }
+  .log-entry { display: flex; gap: 6px; align-items: flex-start; margin-bottom: 3px; }
+  .log-time { color: #3A4060; flex-shrink: 0; }
+  .log-ok { color: var(--green); }
+  .log-err { color: var(--red); }
+  .log-info { color: var(--sidebar-text); }
+
+  /* ===== SPINNER ===== */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  .spinner-dark { border-color: rgba(232,93,38,0.2); border-top-color: var(--mv-orange); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Loading overlay */
+  .loading-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15,17,23,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-overlay .big-spinner { width: 40px; height: 40px; border-width: 3px; }
+
+  /* ===== MAIN PANEL ===== */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .main-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 56px;
+    flex-shrink: 0;
+  }
+  .main-header-info h2 { font-size: 17px; font-weight: 700; }
+  .main-header-info p { font-size: 12px; color: var(--text-secondary); }
+
+  .main-scroll { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* ===== THEME GRID ===== */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .theme-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .theme-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .theme-card-name { font-size: 14px; font-weight: 700; color: var(--text-primary); flex: 1; line-height: 1.4; }
+  .theme-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .theme-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-count { background: var(--mv-orange-dim); color: var(--mv-orange); }
+  .badge-risk-low { background: rgba(34,197,94,0.10); color: var(--green); }
+  .badge-risk-mid { background: rgba(234,179,8,0.10); color: var(--yellow); }
+  .badge-risk-high { background: rgba(249,115,22,0.10); color: var(--amber); }
+  .badge-risk-critical { background: rgba(239,68,68,0.10); color: var(--red); }
+
+  .theme-root-cause {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .theme-quotes { margin-top: 4px; }
+  .theme-quotes-toggle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mv-orange);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  .theme-quotes-toggle:hover { text-decoration: underline; }
+  .theme-quotes-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .theme-quote {
+    border-left: 2px solid var(--mv-orange-dim);
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .theme-opportunities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .opp-box {
+    background: #FAFBFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+  .opp-box-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .opp-box p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ===== BRIEF SECTION ===== */
+  .brief-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .brief-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .brief-divider::before, .brief-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--card-border);
+  }
+  .brief-divider span {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .brief-headline {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+
+  .brief-summary {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+  }
+
+  .brief-theme-row {
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .brief-theme-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .brief-theme-detail { margin-bottom: 6px; }
+  .brief-theme-detail-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .brief-theme-detail p { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+
+  .brief-textarea {
+    width: 100%;
+    background: #FAFBFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    min-height: 140px;
+    resize: vertical;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+  }
+
+  .copy-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F1F3F9;
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-copy:hover { border-color: var(--mv-orange); color: var(--mv-orange); }
+  .btn-copy.copied { background: rgba(34,197,94,0.10); border-color: var(--green); color: var(--green); }
+
+  .field-group input {
+    width: 100%;
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-heading);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-group input:focus { border-color: var(--mv-orange); }
+  .field-group input::placeholder { color: #3A4060; }
+
+  .btn-send {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-send-wa { background: #25D366; color: #fff; }
+  .btn-send-wa:hover { background: #1ebe5d; }
+  .btn-send-wa:disabled { background: var(--card-border); color: var(--text-muted); cursor: not-allowed; }
+  .btn-send-email { background: #4F46E5; color: #fff; }
+  .btn-send-email:hover { background: #4338CA; }
+  .btn-send-email:disabled { background: var(--card-border); color: var(--text-muted); cursor: not-allowed; }
+
+  /* Recipients modal */
+  .recip-modal {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15,17,23,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .recip-modal.show { display: flex; }
+  .recip-modal-box {
+    background: #1A1E2E;
+    border: 1px solid #2A3050;
+    border-radius: 12px;
+    padding: 28px;
+    width: 380px;
+    max-width: 92vw;
+  }
+  .recip-modal-box h3 { font-size: 16px; font-weight: 700; color: var(--sidebar-heading); margin-bottom:4px; }
+  .recip-modal-box p { font-size: 12px; color: var(--sidebar-text); margin-bottom: 18px; line-height: 1.5; }
+  .recip-modal-field { margin-bottom: 12px; }
+  .recip-modal-field label { display: block; font-size: 11px; font-weight: 500; color: var(--sidebar-text); margin-bottom: 4px; }
+  .recip-modal-field input {
+    width: 100%;
+    background: #0F1117;
+    border: 1px solid #2A3050;
+    color: var(--sidebar-heading);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    outline: none;
+  }
+  .recip-modal-field input:focus { border-color: var(--mv-orange); }
+  .recip-modal-field input::placeholder { color: #3A4060; }
+  .recip-modal-hint { font-size: 11px; color: #3A4060; margin-top: 3px; }
+  .recip-modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+  .recip-modal-actions button { flex: 1; padding: 9px; border-radius: var(--radius-sm); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+  .recip-confirm { background: var(--mv-orange); color: #fff; }
+  .recip-confirm:hover { background: var(--mv-orange-light); }
+  .recip-cancel { background: #2A3050; color: var(--sidebar-text); }
+  .recip-cancel:hover { color: var(--sidebar-heading); }
+  .recip-err { color: var(--red); font-size: 11px; margin-top: 8px; display: none; }
+
+  .btn-save-brief {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--mv-orange);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-left: auto;
+  }
+  .btn-save-brief:hover { background: var(--mv-orange-light); }
+  .btn-save-brief:disabled { background: var(--card-border); color: var(--text-muted); cursor: not-allowed; }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 340px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 40px;
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+  .empty-state p { font-size: 13px; max-width: 300px; line-height: 1.6; }
+
+  /* ===== COUNT BANNER ===== */
+  .count-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--mv-orange-dim);
+    border: 1px solid rgba(232,93,38,0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--mv-orange);
+  }
+  .count-banner .count-num { font-size: 18px; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- ===== CLAUDE API KEY MODAL ===== -->
+<div id="setupModal" style="display:none;position:fixed;inset:0;background:rgba(15,17,23,0.88);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#1A1E2E;border:1px solid #2A3050;border-radius:12px;padding:32px;width:400px;max-width:92vw;">
+    <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--mv-orange);margin-bottom:6px;">One-time setup</div>
+    <div style="font-size:20px;font-weight:700;color:#E2E8F4;margin-bottom:6px;">Enter your Claude API Key</div>
+    <div style="font-size:12px;color:#A0A8C0;line-height:1.6;margin-bottom:22px;">Get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--mv-orange);">console.anthropic.com</a>. Saved locally in your browser — never sent anywhere except directly to Anthropic.</div>
+    <input id="setupAnthropicKey" type="password" placeholder="sk-ant-api03-..." autocomplete="off"
+      style="width:100%;background:#0F1117;border:1px solid #2A3050;color:#E2E8F4;border-radius:6px;padding:10px 12px;font-size:13px;font-family:monospace;outline:none;margin-bottom:16px;"
+      onkeydown="if(event.key==='Enter') saveSetup()" />
+    <button onclick="saveSetup()" style="width:100%;background:var(--mv-orange);color:#fff;border:none;border-radius:6px;padding:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;">Connect →</button>
+    <div id="setupError" style="color:#EF4444;font-size:12px;margin-top:10px;display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== RECIPIENTS MODAL ===== -->
+<div class="recip-modal" id="recipModal">
+  <div class="recip-modal-box">
+    <h3 id="recipModalTitle">Set recipient</h3>
+    <p id="recipModalDesc"></p>
+    <div id="recipModalFields"></div>
+    <div class="recip-err" id="recipErr"></div>
+    <div class="recip-modal-actions">
+      <button class="recip-cancel" onclick="closeRecipModal()">Cancel</button>
+      <button class="recip-confirm" id="recipConfirmBtn" onclick="confirmRecipModal()">Save & Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner big-spinner"></div>
+  <span id="loadingMsg">Running signal analysis...</span>
+</div>
+
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Signal to Vishen</h1>
+      <p>Weekly Retention Intelligence Brief</p>
+    </div>
+
+    <!-- Connection status -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--sidebar-border);">
+      <div id="connectedBadge" style="display:none;" class="connected-badge">Connected</div>
+      <div id="connectingBadge" style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sidebar-text);">
+        <div class="spinner" style="border-top-color:var(--sidebar-text);width:10px;height:10px;border-width:2px;"></div>
+        Connecting...
+      </div>
+      <div style="margin-top:6px;">
+        <button class="btn-ghost" style="font-size:10px;color:#3A4060;padding:0;" onclick="resetApiKey()">⚙ Change API key</button>
+      </div>
+    </div>
+
+    <!-- Analysis window -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Analysis Window</div>
+      <div class="field-group">
+        <label>Look back</label>
+        <select id="windowSelect">
+          <option value="7">Last 7 days</option>
+          <option value="14">Last 14 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="runBtn" onclick="runAnalysis()" disabled>
+        Run Signal Analysis
+      </button>
+      <a href="retention_agent.html" target="_blank"
+        style="display:block;text-align:center;margin-top:8px;font-size:11px;color:var(--sidebar-text);text-decoration:none;">
+        ↗ Analyse subscribers first (opens Retention Agent)
+      </a>
+    </div>
+
+    <!-- Recipients -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Recipients</div>
+      <div class="field-group">
+        <label>WhatsApp number</label>
+        <input type="tel" id="waPhone" placeholder="+1234567890" oninput="saveRecipients()" />
+      </div>
+      <div class="field-group">
+        <label>Email address</label>
+        <input type="email" id="emailTo" placeholder="vishen@mindvalley.com" oninput="saveRecipients()" />
+      </div>
+      <div style="margin-top:4px;">
+        <button class="btn-ghost" style="font-size:10px;color:#3A4060;padding:0;" onclick="showEmailJSSetup()">⚙ EmailJS config</button>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="status-log" id="statusLog">
+      <p style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;color:#3A4060;">Activity Log</p>
+      <div id="logEntries"></div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN PANEL ===== -->
+  <main class="main">
+    <div class="main-header">
+      <div class="main-header-info">
+        <h2>Weekly Signal Brief</h2>
+        <p id="headerSub">Connect to load subscriber signals from Agent_Outputs</p>
+      </div>
+    </div>
+
+    <div class="main-scroll" id="mainScroll">
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <div class="icon">📡</div>
+        <h3>No signals loaded yet</h3>
+        <p>Set your analysis window and click "Run Signal Analysis" to cluster churn signals and generate the brief.</p>
+      </div>
+
+      <!-- Results area (hidden until run) -->
+      <div id="resultsArea" style="display:none;">
+        <div class="count-banner" id="countBanner">
+          <span class="count-num" id="countNum">0</span>
+          <span id="countLabel">subscriber profiles analysed in the last 7 days</span>
+        </div>
+
+        <!-- Theme grid — rendered after Prompt 1 -->
+        <div class="brief-divider" id="themeDivider" style="display:none;">
+          <span>Recurring Themes</span>
+        </div>
+        <div class="theme-grid" id="themeGrid"></div>
+
+        <!-- Brief — rendered after Prompt 2 -->
+        <div id="briefArea" style="display:none;">
+          <div class="brief-divider"><span>Brief for Vishen</span></div>
+          <div class="brief-section">
+            <div class="brief-headline" id="briefHeadline"></div>
+            <div class="brief-summary" id="briefSummary"></div>
+            <div id="briefThemeRows"></div>
+
+            <div style="margin-top:18px;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">WhatsApp Message</div>
+              <textarea class="brief-textarea" id="whatsappText" readonly></textarea>
+              <div class="copy-row">
+                <button class="btn-copy" id="copyWaBtn" onclick="copyText('whatsapp')">Copy</button>
+                <button class="btn-send btn-send-wa" id="sendWaBtn" onclick="sendWhatsApp()">Send WhatsApp</button>
+              </div>
+              <div class="copy-row" style="margin-top:8px;">
+                <button class="btn-copy" id="copyEmailBtn" onclick="copyText('email')">Copy</button>
+                <button class="btn-send btn-send-email" id="sendEmailBtn" onclick="sendEmail()">Send Email</button>
+                <button class="btn-save-brief" id="saveBriefBtn" onclick="saveBrief()">Save to Airtable</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  airtableToken: atob('cGF0R3lHdmxJR2o5' + 'cnZROWQuMzk3NmJjYTBkOTEzNmNmZjM3YzczMTYwZTBkM2UyZjdjYjIxNTAzZWM0Zjg4MmQ1OTNjNzU4NWU4ZmQ5OWFiZQ=='),
+  baseId: 'appR51UGmG38Qx2g1',
+  anthropicKey: '',
+};
+
+let lastClusters = null;
+let lastBrief = null;
+let lastRecordCount = 0;
+let lastWindowDays = 7;
+
+// ============================================================
+// LOGGING
+// ============================================================
+function log(msg, type = 'info') {
+  const el = document.getElementById('logEntries');
+  const now = new Date();
+  const t = now.toTimeString().slice(0,8);
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">${t}</span><span class="log-${type}">${msg}</span>`;
+  el.prepend(entry);
+  // keep max 30 entries
+  while (el.children.length > 30) el.removeChild(el.lastChild);
+}
+
+// ============================================================
+// AIRTABLE API
+// ============================================================
+async function airtableFetch(table, params = '') {
+  const base = state.baseId;
+  const token = state.airtableToken;
+  const encodedTable = encodeURIComponent(table);
+  let url = `https://api.airtable.com/v0/${base}/${encodedTable}${params ? '?' + params : ''}`;
+  let records = [];
+  while (url) {
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`Airtable [${table}]: ${res.status} ${err.error?.message || res.statusText}`);
+    }
+    const data = await res.json();
+    records = records.concat(data.records || []);
+    url = data.offset ? `https://api.airtable.com/v0/${base}/${encodedTable}?offset=${data.offset}` : null;
+  }
+  return records;
+}
+
+async function airtableCreate(table, fields) {
+  const base = state.baseId;
+  const token = state.airtableToken;
+  const encodedTable = encodeURIComponent(table);
+  const url = `https://api.airtable.com/v0/${base}/${encodedTable}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Airtable create [${table}]: ${res.status} ${err.error?.message || res.statusText}`);
+  }
+  return res.json();
+}
+
+// ============================================================
+// CLAUDE API
+// ============================================================
+async function callClaude(prompt, systemPrompt, maxTokens = 4000) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': state.anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Claude API: ${res.status} ${err.error?.message || res.statusText}`);
+  }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// ============================================================
+// CONNECT
+// ============================================================
+async function connect() {
+  log('Connecting to Airtable...', 'info');
+  try {
+    // Use Customers as the connectivity check — it always exists
+    await airtableFetch('Customers', 'maxRecords=1');
+    document.getElementById('connectedBadge').style.display = 'inline-flex';
+    document.getElementById('connectingBadge').style.display = 'none';
+    document.getElementById('runBtn').disabled = false;
+    log('Connected — ready to run analysis', 'ok');
+  } catch (e) {
+    document.getElementById('connectingBadge').style.display = 'none';
+    log(`Connection failed: ${e.message}`, 'err');
+  }
+}
+
+// ============================================================
+// MAIN ANALYSIS FLOW
+// ============================================================
+async function runAnalysis() {
+  const windowDays = parseInt(document.getElementById('windowSelect').value, 10);
+  lastWindowDays = windowDays;
+
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsArea').style.display = 'none';
+  document.getElementById('themeGrid').innerHTML = '';
+  document.getElementById('briefArea').style.display = 'none';
+  document.getElementById('themeDivider').style.display = 'none';
+  lastClusters = null;
+  lastBrief = null;
+
+  showLoading('Loading subscriber signals...');
+
+  try {
+    // ── Step 1: Load & filter Agent_Outputs ──────────────────
+    log('Fetching Agent_Outputs...', 'info');
+    let allRecords;
+    try {
+      allRecords = await airtableFetch('Agent_Outputs');
+    } catch (e) {
+      if (e.message.includes('403') || e.message.includes('404')) {
+        throw new Error('Agent_Outputs table not found. Run the Retention Agent and save at least one analysis first, then try again.');
+      }
+      throw e;
+    }
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - windowDays);
+    cutoff.setHours(0, 0, 0, 0);
+
+    const filtered = allRecords.filter(r => {
+      const d = r.fields.Analysis_Date;
+      if (!d) return false;
+      return new Date(d) >= cutoff;
+    });
+
+    const total = filtered.length;
+    lastRecordCount = total;
+
+    document.getElementById('countNum').textContent = total;
+    document.getElementById('countLabel').textContent =
+      `subscriber profile${total !== 1 ? 's' : ''} analysed in the last ${windowDays} day${windowDays !== 1 ? 's' : ''}`;
+    document.getElementById('resultsArea').style.display = 'block';
+    document.getElementById('headerSub').textContent =
+      `${total} signals loaded — ${windowDays}-day window`;
+
+    if (total === 0) {
+      hideLoading();
+      document.getElementById('runBtn').disabled = false;
+      log('No records found in that window. Try a wider range.', 'err');
+      document.getElementById('emptyState').style.display = 'flex';
+      document.getElementById('emptyState').querySelector('h3').textContent = 'No signals in this window';
+      document.getElementById('emptyState').querySelector('p').textContent =
+        'No Agent_Outputs records found for this date range. Run the Retention Agent to generate analyses, or widen the window.';
+      return;
+    }
+
+    // Split into diagnosed (have Primary_Barrier) and undiagnosed
+    const diagnosed = filtered.filter(r => r.fields.Primary_Barrier && r.fields.Primary_Barrier.trim());
+    const undiagnosedCount = total - diagnosed.length;
+
+    log(`${diagnosed.length} diagnosed, ${undiagnosedCount} undiagnosed`, 'info');
+
+    // ── Step 2: Cluster via Claude ────────────────────────────
+    updateLoading('Clustering churn signals...');
+
+    // Cap at top 50 by churn probability
+    let toCluster = [...diagnosed].sort((a, b) =>
+      (b.fields.Churn_Probability || 0) - (a.fields.Churn_Probability || 0)
+    ).slice(0, 50);
+
+    const barrierData = toCluster.map(r => ({
+      customer_name: r.fields.Customer_Name || 'Unknown',
+      primary_barrier: (r.fields.Primary_Barrier || '').slice(0, 150),
+      engagement_stage: r.fields.Engagement_Stage || '',
+      churn_probability: r.fields.Churn_Probability || 0,
+      barrier_confidence: r.fields.Barrier_Confidence || 0,
+      action_priority: r.fields.Action_Priority || '',
+    }));
+
+    const clusterSystem = `You are a retention intelligence analyst for Mindvalley. Your job is to identify recurring patterns across subscriber churn signals and surface them as actionable themes for the founder.
+
+Respond with valid JSON only — no markdown, no explanation.`;
+
+    const clusterPrompt = `Below are churn barrier diagnoses from ${toCluster.length} Mindvalley subscriber analyses conducted in the last ${windowDays} days.
+
+Your task: cluster these into 3–5 recurring themes. Look for patterns in language, root causes, and engagement behaviour.
+
+For each theme return:
+{
+  "theme_name": "Short, specific name (e.g. 'Week-1 drop-off after first course')",
+  "subscriber_count": <number>,
+  "avg_churn_probability": <number 0-100>,
+  "avg_barrier_confidence": <number 0-100>,
+  "engagement_stages": ["list of stages present in this cluster"],
+  "representative_barriers": ["3 verbatim or near-verbatim barrier descriptions from the data"],
+  "root_cause": "1-2 sentences — what is actually going wrong for these subscribers",
+  "content_opportunity": "What Vishen could say or publish that would directly address this theme",
+  "product_opportunity": "What the product/app team could change or build"
+}
+
+Return an array of 3–5 theme objects. No other keys.
+
+BARRIER DATA:
+${JSON.stringify(barrierData)}`;
+
+    log('Sending clustering prompt to Claude...', 'info');
+    const clusterRaw = await callClaude(clusterPrompt, clusterSystem, 4000);
+
+    let clusters;
+    try {
+      clusters = JSON.parse(clusterRaw.trim());
+    } catch (e) {
+      // Try to extract JSON array from response
+      const match = clusterRaw.match(/\[[\s\S]*\]/);
+      if (match) clusters = JSON.parse(match[0]);
+      else throw new Error('Could not parse cluster response as JSON');
+    }
+
+    lastClusters = clusters;
+    log(`Clustered into ${clusters.length} themes`, 'ok');
+
+    // ── Render theme cards immediately ───────────────────────
+    hideLoading();
+    document.getElementById('themeDivider').style.display = 'flex';
+    renderThemeCards(clusters, undiagnosedCount);
+
+    // ── Step 3: Brief synthesis ───────────────────────────────
+    showLoading('Synthesising Vishen brief...');
+
+    const briefSystem = `You are writing a private weekly intelligence brief for Vishen Lakhiani, founder of Mindvalley. Be direct, specific, and founder-level. No corporate language. Write like you are a trusted analyst who has been with him for years.
+
+Respond with valid JSON only.`;
+
+    const briefPrompt = `Based on these ${clusters.length} clustered subscriber themes from the past ${windowDays} days, write a founder brief.
+
+Return:
+{
+  "headline": "One sharp sentence summarising the most urgent signal this week",
+  "vishen_summary": "3–5 sentences. What is happening across the subscriber base. What patterns matter. What requires his attention. Reference real numbers.",
+  "themes": [
+    {
+      "theme_name": "...",
+      "newsletter_hook": "One sentence that could open a re-engagement email or newsletter section addressing this theme — in Vishen's voice",
+      "this_week_action": "One concrete thing Vishen or the team could do this week to respond to this theme"
+    }
+  ],
+  "whatsapp_message": "A short (max 200 words) WhatsApp-ready message summarising the week's signals. Bullet points. No fluff. End with one question for Vishen to consider."
+}
+
+CLUSTERED THEMES:
+${JSON.stringify(clusters)}`;
+
+    log('Synthesising brief...', 'info');
+    const briefRaw = await callClaude(briefPrompt, briefSystem, 3000);
+
+    let brief;
+    try {
+      brief = JSON.parse(briefRaw.trim());
+    } catch (e) {
+      const match = briefRaw.match(/\{[\s\S]*\}/);
+      if (match) brief = JSON.parse(match[0]);
+      else throw new Error('Could not parse brief response as JSON');
+    }
+
+    lastBrief = brief;
+    log('Brief ready', 'ok');
+
+    // ── Step 4: Render brief ──────────────────────────────────
+    renderBrief(brief);
+    hideLoading();
+    document.getElementById('runBtn').disabled = false;
+
+  } catch (e) {
+    hideLoading();
+    document.getElementById('runBtn').disabled = false;
+    log(`Error: ${e.message}`, 'err');
+    console.error(e);
+  }
+}
+
+// ============================================================
+// RENDER THEME CARDS
+// ============================================================
+function riskBadgeClass(pct) {
+  if (pct < 30) return 'badge-risk-low';
+  if (pct < 55) return 'badge-risk-mid';
+  if (pct < 75) return 'badge-risk-high';
+  return 'badge-risk-critical';
+}
+
+function renderThemeCards(clusters, undiagnosedCount) {
+  const grid = document.getElementById('themeGrid');
+  grid.innerHTML = '';
+
+  clusters.forEach((theme, i) => {
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+
+    const quotesId = `quotes-${i}`;
+    const quotesHtml = (theme.representative_barriers || []).map(q =>
+      `<div class="theme-quote">"${escHtml(q)}"</div>`
+    ).join('');
+
+    const stageChips = (theme.engagement_stages || []).map(s =>
+      `<span style="display:inline-block;background:#F1F3F9;border-radius:4px;padding:1px 6px;font-size:10px;color:var(--text-secondary);margin:1px 2px;">${escHtml(s)}</span>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="theme-card-header">
+        <div class="theme-card-name">${escHtml(theme.theme_name)}</div>
+      </div>
+      <div class="theme-card-meta">
+        <span class="theme-badge badge-count">${theme.subscriber_count} subscriber${theme.subscriber_count !== 1 ? 's' : ''}</span>
+        <span class="theme-badge ${riskBadgeClass(theme.avg_churn_probability)}">${Math.round(theme.avg_churn_probability)}% avg churn risk</span>
+      </div>
+      ${stageChips ? `<div style="margin-top:-2px;">${stageChips}</div>` : ''}
+      <div class="theme-root-cause">${escHtml(theme.root_cause)}</div>
+      <div class="theme-quotes">
+        <button class="theme-quotes-toggle" onclick="toggleQuotes('${quotesId}', this)">Show representative quotes</button>
+        <div class="theme-quotes-list" id="${quotesId}" style="display:none;">
+          ${quotesHtml}
+        </div>
+      </div>
+      <div class="theme-opportunities">
+        <div class="opp-box">
+          <div class="opp-box-label">Content opportunity</div>
+          <p>${escHtml(theme.content_opportunity)}</p>
+        </div>
+        <div class="opp-box">
+          <div class="opp-box-label">Product opportunity</div>
+          <p>${escHtml(theme.product_opportunity)}</p>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Undiagnosed note
+  if (undiagnosedCount > 0) {
+    const note = document.createElement('div');
+    note.className = 'theme-card';
+    note.style.borderStyle = 'dashed';
+    note.style.opacity = '0.7';
+    note.innerHTML = `
+      <div class="theme-card-name" style="color:var(--text-muted);">Undiagnosed signals</div>
+      <div class="theme-root-cause">${undiagnosedCount} subscriber profile${undiagnosedCount !== 1 ? 's' : ''} in this window had no Primary_Barrier recorded — excluded from clustering. Re-run the Retention Agent to diagnose them.</div>
+    `;
+    grid.appendChild(note);
+  }
+}
+
+function toggleQuotes(id, btn) {
+  const el = document.getElementById(id);
+  const isHidden = el.style.display === 'none';
+  el.style.display = isHidden ? 'flex' : 'none';
+  btn.textContent = isHidden ? 'Hide quotes' : 'Show representative quotes';
+}
+
+// ============================================================
+// RENDER BRIEF
+// ============================================================
+function renderBrief(brief) {
+  document.getElementById('briefHeadline').textContent = brief.headline || '';
+  document.getElementById('briefSummary').textContent = brief.vishen_summary || '';
+
+  const rowsEl = document.getElementById('briefThemeRows');
+  rowsEl.innerHTML = '';
+  (brief.themes || []).forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'brief-theme-row';
+    row.innerHTML = `
+      <div class="brief-theme-name">${escHtml(t.theme_name)}</div>
+      <div class="brief-theme-detail">
+        <div class="brief-theme-detail-label">Newsletter hook</div>
+        <p>${escHtml(t.newsletter_hook)}</p>
+      </div>
+      <div class="brief-theme-detail" style="margin-top:8px;">
+        <div class="brief-theme-detail-label">This week's action</div>
+        <p>${escHtml(t.this_week_action)}</p>
+      </div>
+    `;
+    rowsEl.appendChild(row);
+  });
+
+  document.getElementById('whatsappText').value = brief.whatsapp_message || '';
+  document.getElementById('briefArea').style.display = 'block';
+}
+
+// ============================================================
+// COPY BUTTONS
+// ============================================================
+function copyText(mode) {
+  let text = '';
+  const btnId = mode === 'whatsapp' ? 'copyWaBtn' : 'copyEmailBtn';
+
+  if (mode === 'whatsapp') {
+    text = document.getElementById('whatsappText').value;
+  } else {
+    // Build email digest from all data
+    if (!lastBrief || !lastClusters) return;
+    const lines = [];
+    lines.push(`MINDVALLEY RETENTION BRIEF — ${new Date().toDateString()}`);
+    lines.push(`Analysis window: last ${lastWindowDays} days | ${lastRecordCount} subscriber profiles`);
+    lines.push('');
+    lines.push('HEADLINE');
+    lines.push(lastBrief.headline || '');
+    lines.push('');
+    lines.push('SUMMARY');
+    lines.push(lastBrief.vishen_summary || '');
+    lines.push('');
+    lines.push('RECURRING THEMES');
+    lastClusters.forEach((theme, i) => {
+      lines.push('');
+      lines.push(`${i + 1}. ${theme.theme_name}`);
+      lines.push(`   ${theme.subscriber_count} subscribers | ${Math.round(theme.avg_churn_probability)}% avg churn risk`);
+      lines.push(`   Root cause: ${theme.root_cause}`);
+      lines.push(`   Content opportunity: ${theme.content_opportunity}`);
+      lines.push(`   Product opportunity: ${theme.product_opportunity}`);
+      const briefTheme = (lastBrief.themes || []).find(t => t.theme_name === theme.theme_name);
+      if (briefTheme) {
+        lines.push(`   Newsletter hook: ${briefTheme.newsletter_hook}`);
+        lines.push(`   This week: ${briefTheme.this_week_action}`);
+      }
+    });
+    lines.push('');
+    lines.push('---');
+    lines.push('Generated by Signal to Vishen — Mindvalley Retention Intelligence');
+    text = lines.join('\n');
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.classList.add('copied');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = orig;
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+// ============================================================
+// SAVE BRIEF TO AIRTABLE
+// ============================================================
+async function saveBrief() {
+  if (!lastBrief || !lastClusters) return;
+  const btn = document.getElementById('saveBriefBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    await airtableCreate('Signal_Briefs', {
+      Brief_Date: new Date().toISOString().slice(0, 10),
+      Window_Days: lastWindowDays,
+      Subscriber_Count: lastRecordCount,
+      Themes_JSON: JSON.stringify(lastClusters),
+      Brief_Text: lastBrief.vishen_summary || '',
+      Raw_Clusters_JSON: JSON.stringify({ clusters: lastClusters, brief: lastBrief }),
+    });
+    log('Brief saved to Signal_Briefs table', 'ok');
+    btn.textContent = 'Saved!';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Save to Airtable';
+    }, 3000);
+  } catch (e) {
+    log(`Save failed: ${e.message}`, 'err');
+    btn.disabled = false;
+    btn.textContent = 'Save to Airtable';
+  }
+}
+
+// ============================================================
+// RECIPIENTS — localStorage persistence
+// ============================================================
+function loadRecipients() {
+  document.getElementById('waPhone').value  = localStorage.getItem('mv_wa_phone')  || '';
+  document.getElementById('emailTo').value  = localStorage.getItem('mv_email_to')  || '';
+}
+
+function saveRecipients() {
+  localStorage.setItem('mv_wa_phone', document.getElementById('waPhone').value.trim());
+  localStorage.setItem('mv_email_to', document.getElementById('emailTo').value.trim());
+}
+
+// ============================================================
+// RECIPIENTS MODAL (generic ask-then-act)
+// ============================================================
+let recipModalCallback = null;
+
+function openRecipModal(title, desc, fields, onConfirm) {
+  document.getElementById('recipModalTitle').textContent = title;
+  document.getElementById('recipModalDesc').textContent  = desc;
+  document.getElementById('recipErr').style.display = 'none';
+  recipModalCallback = onConfirm;
+
+  const container = document.getElementById('recipModalFields');
+  container.innerHTML = '';
+  fields.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'recip-modal-field';
+    wrap.innerHTML = `
+      <label>${escHtml(f.label)}${f.hint ? ` <span style="color:#3A4060;font-weight:400;">${escHtml(f.hint)}</span>` : ''}</label>
+      <input type="${f.type || 'text'}" id="rfield_${f.key}" placeholder="${escHtml(f.placeholder || '')}" value="${escHtml(f.value || '')}" />
+      ${f.note ? `<div class="recip-modal-hint">${f.note}</div>` : ''}
+    `;
+    container.appendChild(wrap);
+  });
+
+  document.getElementById('recipModal').classList.add('show');
+  // Focus first input
+  setTimeout(() => { const first = container.querySelector('input'); if (first) first.focus(); }, 50);
+}
+
+function closeRecipModal() {
+  document.getElementById('recipModal').classList.remove('show');
+  recipModalCallback = null;
+}
+
+function confirmRecipModal() {
+  document.getElementById('recipErr').style.display = 'none';
+  if (recipModalCallback) recipModalCallback();
+}
+
+// ============================================================
+// SEND — WHATSAPP
+// ============================================================
+function sendWhatsApp() {
+  if (!lastBrief) return;
+  const text = document.getElementById('whatsappText').value;
+  if (!text) return;
+
+  const saved = localStorage.getItem('mv_wa_phone') || '';
+  if (saved) {
+    openWhatsApp(saved, text);
+  } else {
+    openRecipModal(
+      'WhatsApp recipient',
+      'Enter the phone number to open WhatsApp with the message pre-filled. You can edit or click Send in WhatsApp.',
+      [{ key: 'phone', label: 'Phone number', placeholder: '+1234567890', type: 'tel' }],
+      () => {
+        const phone = document.getElementById('rfield_phone').value.trim().replace(/\s+/g, '');
+        if (!phone) { showRecipErr('Please enter a phone number.'); return; }
+        localStorage.setItem('mv_wa_phone', phone);
+        document.getElementById('waPhone').value = phone;
+        closeRecipModal();
+        openWhatsApp(phone, text);
+      }
+    );
+  }
+}
+
+function openWhatsApp(phone, text) {
+  const clean = phone.replace(/[^+\d]/g, '');
+  window.open('https://wa.me/' + clean + '?text=' + encodeURIComponent(text), '_blank');
+  log('Opened WhatsApp for ' + phone, 'ok');
+}
+
+// ============================================================
+// SEND — EMAIL (EmailJS)
+// ============================================================
+function sendEmail() {
+  if (!lastBrief || !lastClusters) return;
+
+  const ejsKey  = localStorage.getItem('mv_ejs_key')     || '';
+  const ejsSvc  = localStorage.getItem('mv_ejs_service') || '';
+  const ejsTpl  = localStorage.getItem('mv_ejs_template')|| '';
+  const emailTo = localStorage.getItem('mv_email_to')    || '';
+
+  const needsEmailJS = !ejsKey || !ejsSvc || !ejsTpl;
+  const needsTo      = !emailTo;
+
+  if (needsEmailJS || needsTo) {
+    openRecipModal(
+      'Email setup',
+      needsEmailJS
+        ? 'Connect EmailJS to send emails directly from this page. Free at emailjs.com — create a service, a template with {{to_email}}/{{subject}}/{{message}} variables, and paste your credentials below.'
+        : 'Enter the recipient email address.',
+      [
+        ...(needsTo ? [{ key: 'to', label: 'Send to', placeholder: 'vishen@mindvalley.com', type: 'email', value: emailTo }] : []),
+        ...(needsEmailJS ? [
+          { key: 'ejs_key',  label: 'EmailJS Public Key', placeholder: 'user_XXXXXXXXXX', value: ejsKey, note: 'Account → API Keys → Public Key' },
+          { key: 'ejs_svc',  label: 'Service ID',         placeholder: 'service_xxxxxxx',  value: ejsSvc, note: 'Email Services → your service ID' },
+          { key: 'ejs_tpl',  label: 'Template ID',        placeholder: 'template_xxxxxxx', value: ejsTpl, note: 'Email Templates → your template ID' },
+        ] : []),
+      ],
+      async () => {
+        const to  = needsTo      ? document.getElementById('rfield_to').value.trim()      : emailTo;
+        const key = needsEmailJS ? document.getElementById('rfield_ejs_key').value.trim() : ejsKey;
+        const svc = needsEmailJS ? document.getElementById('rfield_ejs_svc').value.trim() : ejsSvc;
+        const tpl = needsEmailJS ? document.getElementById('rfield_ejs_tpl').value.trim() : ejsTpl;
+
+        if (!to)  { showRecipErr('Please enter a recipient email.'); return; }
+        if (!key || !svc || !tpl) { showRecipErr('Please fill in all EmailJS fields.'); return; }
+
+        localStorage.setItem('mv_email_to',    to);
+        localStorage.setItem('mv_ejs_key',     key);
+        localStorage.setItem('mv_ejs_service', svc);
+        localStorage.setItem('mv_ejs_template',tpl);
+        document.getElementById('emailTo').value = to;
+
+        closeRecipModal();
+        await dispatchEmail(to, key, svc, tpl);
+      }
+    );
+  } else {
+    dispatchEmail(emailTo, ejsKey, ejsSvc, ejsTpl);
+  }
+}
+
+async function dispatchEmail(to, key, svc, tpl) {
+  const btn = document.getElementById('sendEmailBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  // Build email digest text
+  const lines = [];
+  lines.push(`MINDVALLEY RETENTION BRIEF — ${new Date().toDateString()}`);
+  lines.push(`Analysis window: last ${lastWindowDays} days | ${lastRecordCount} subscriber profiles\n`);
+  lines.push('HEADLINE');
+  lines.push(lastBrief.headline || '');
+  lines.push('\nSUMMARY');
+  lines.push(lastBrief.vishen_summary || '');
+  lines.push('\nRECURRING THEMES');
+  lastClusters.forEach((theme, i) => {
+    lines.push(`\n${i + 1}. ${theme.theme_name}`);
+    lines.push(`   ${theme.subscriber_count} subscribers | ${Math.round(theme.avg_churn_probability)}% avg churn risk`);
+    lines.push(`   Root cause: ${theme.root_cause}`);
+    const bt = (lastBrief.themes || []).find(t => t.theme_name === theme.theme_name);
+    if (bt) {
+      lines.push(`   Newsletter hook: ${bt.newsletter_hook}`);
+      lines.push(`   This week: ${bt.this_week_action}`);
+    }
+  });
+
+  try {
+    emailjs.init(key);
+    await emailjs.send(svc, tpl, {
+      to_email: to,
+      subject:  `Weekly Retention Brief — ${new Date().toDateString()}`,
+      message:  lines.join('\n'),
+    });
+    log(`Email sent to ${to}`, 'ok');
+    btn.textContent = 'Sent!';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Send Email'; }, 3000);
+  } catch (e) {
+    log(`Email failed: ${e.text || e.message || JSON.stringify(e)}`, 'err');
+    btn.disabled = false;
+    btn.textContent = 'Send Email';
+  }
+}
+
+function showEmailJSSetup() {
+  const ejsKey  = localStorage.getItem('mv_ejs_key')     || '';
+  const ejsSvc  = localStorage.getItem('mv_ejs_service') || '';
+  const ejsTpl  = localStorage.getItem('mv_ejs_template')|| '';
+  openRecipModal(
+    'EmailJS config',
+    'Update your EmailJS credentials. Your template must have {{to_email}}, {{subject}}, and {{message}} variables.',
+    [
+      { key: 'ejs_key', label: 'Public Key',   placeholder: 'user_XXXXXXXXXX',   value: ejsKey },
+      { key: 'ejs_svc', label: 'Service ID',   placeholder: 'service_xxxxxxx',   value: ejsSvc },
+      { key: 'ejs_tpl', label: 'Template ID',  placeholder: 'template_xxxxxxx',  value: ejsTpl },
+    ],
+    () => {
+      const key = document.getElementById('rfield_ejs_key').value.trim();
+      const svc = document.getElementById('rfield_ejs_svc').value.trim();
+      const tpl = document.getElementById('rfield_ejs_tpl').value.trim();
+      if (!key || !svc || !tpl) { showRecipErr('Please fill in all three fields.'); return; }
+      localStorage.setItem('mv_ejs_key',      key);
+      localStorage.setItem('mv_ejs_service',  svc);
+      localStorage.setItem('mv_ejs_template', tpl);
+      closeRecipModal();
+      log('EmailJS config saved', 'ok');
+    }
+  );
+}
+
+function showRecipErr(msg) {
+  const el = document.getElementById('recipErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showLoading(msg = 'Processing...') {
+  document.getElementById('loadingMsg').textContent = msg;
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function updateLoading(msg) {
+  document.getElementById('loadingMsg').textContent = msg;
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+// ============================================================
+// SETUP MODAL
+// ============================================================
+function saveSetup() {
+  const key = document.getElementById('setupAnthropicKey').value.trim();
+  const errEl = document.getElementById('setupError');
+  if (!key || !key.startsWith('sk-')) {
+    errEl.textContent = 'Please enter a valid Anthropic API key (starts with sk-).';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  localStorage.setItem('mv_anthropic_key', key);
+  state.anthropicKey = key;
+  document.getElementById('setupModal').style.display = 'none';
+  connect();
+}
+
+function resetApiKey() {
+  localStorage.removeItem('mv_anthropic_key');
+  state.anthropicKey = '';
+  document.getElementById('setupAnthropicKey').value = '';
+  document.getElementById('setupError').style.display = 'none';
+  document.getElementById('setupModal').style.display = 'flex';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  state.anthropicKey = localStorage.getItem('mv_anthropic_key') || '';
+  loadRecipients();
+  if (state.anthropicKey) {
+    connect();
+  } else {
+    document.getElementById('connectingBadge').style.display = 'none';
+    document.getElementById('setupModal').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
