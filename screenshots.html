@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal to Vishen — Output</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #E85D26;
+    --bg: #0F1117;
+    --bg-card: #141720;
+    --border: #1E2130;
+    --text: #E2E8F4;
+    --text-muted: #5A6380;
+    --text-sub: #8890A8;
+  }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; }
+
+  .page { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  .header {
+    padding: 52px 0 40px;
+    text-align: center;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    text-decoration: none;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .back:hover { border-color: var(--orange); color: var(--orange); }
+
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(26px, 5vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .sub {
+    font-size: 15px;
+    color: var(--text-sub);
+  }
+
+  .screenshots {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 64px;
+  }
+  .screenshot-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-card);
+  }
+  .screenshot-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .screenshot-caption {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .run-row {
+    text-align: center;
+    padding: 8px 0 48px;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--orange);
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #FF7A45; }
+
+  @media (max-width: 600px) {
+    .header { padding: 36px 0 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div><a href="https://5twto.github.io/mv_application/index.html" class="back">← Back</a></div>
+    <div class="label">Signal to Vishen — Output</div>
+    <h1>What it looks like</h1>
+    <p class="sub">Live output from a real analysis run</p>
+  </div>
+
+  <div class="screenshots">
+
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_1.png" alt="Recurring churn themes clustered across subscriber base" />
+      <div class="screenshot-caption">Recurring churn themes — clustered across subscriber base</div>
+    </div>
+
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_2.png" alt="Weekly brief — WhatsApp-ready output" />
+      <div class="screenshot-caption">Weekly brief — WhatsApp-ready output</div>
+    </div>
+
+    <div class="screenshot-wrap">
+      <img src="./screenshots/screenshot_3.png" alt="Theme detail — root cause and content opportunity" />
+      <div class="screenshot-caption">Theme detail — root cause and content opportunity</div>
+    </div>
+
+  </div>
+
+  <div class="run-row">
+    <a href="https://5twto.github.io/mv_application/signal_to_vishen.html" class="btn-primary">Run it yourself →</a>
+  </div>
+
+</div>
+</body>
+</html>

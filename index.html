@@ -174,33 +174,30 @@
     line-height: 1.6;
   }
 
-  /* ── SCREENSHOTS ── */
-  .screenshots {
+  /* ── SECONDARY ROW ── */
+  .cta-row-secondary {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
   }
-
-  .screenshot-wrap {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--bg-card);
-  }
-
-  .screenshot-wrap img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .screenshot-caption {
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-    border-top: 1px solid var(--border);
+  .btn-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    color: var(--text-sub);
+    text-decoration: none;
+    font-size: 13px;
     font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
   }
+  .btn-sm:hover { border-color: var(--orange); color: var(--orange); }
 
   /* ── FOOTER ── */
   .footer {
@@ -232,12 +229,11 @@
     <p class="subheadline">The retention agent submitted tells you who is at risk. This tells you why — across the board — and delivers a brief you can act on directly.</p>
     <div class="cta-row">
       <a href="https://5twto.github.io/mv_application/signal_to_vishen.html" class="btn-primary">Run it yourself →</a>
-      <a href="https://5twto.github.io/mv_application/retention_agent.html" class="btn-secondary">See the retention agent →</a>
+      <a href="https://5twto.github.io/mv_application/screenshots.html" class="btn-secondary">See the output →</a>
     </div>
-    <div style="margin-top:16px;font-size:13px;color:var(--text-muted);">
-      <a href="https://5twto.github.io/mv_application/retention_agent.html" style="color:var(--text-sub);text-decoration:none;border-bottom:1px solid var(--border);">Retention Agent</a>
-      &nbsp;·&nbsp;
-      <a href="https://github.com/5twto/mv_application" style="color:var(--text-sub);text-decoration:none;border-bottom:1px solid var(--border);">README &amp; source →</a>
+    <div class="cta-row-secondary">
+      <a href="https://5twto.github.io/mv_application/retention_agent.html" class="btn-sm">Run original retention agent →</a>
+      <a href="https://github.com/5twto/mv_application" class="btn-sm">What the retention agent is →</a>
     </div>
   </header>
 
@@ -266,31 +262,6 @@
     </div>
   </section>
 
-  <hr class="divider" />
-
-  <!-- ── SCREENSHOTS ── -->
-  <section class="section">
-    <div class="section-label">Output</div>
-    <h2 class="section-title">What it looks like</h2>
-    <div class="screenshots">
-
-      <div class="screenshot-wrap">
-        <img src="./screenshots/screenshot_1.png" alt="Recurring churn themes clustered across subscriber base" />
-        <div class="screenshot-caption">Recurring churn themes — clustered across subscriber base</div>
-      </div>
-
-      <div class="screenshot-wrap">
-        <img src="./screenshots/screenshot_2.png" alt="Weekly brief — WhatsApp-ready output" />
-        <div class="screenshot-caption">Weekly brief — WhatsApp-ready output</div>
-      </div>
-
-      <div class="screenshot-wrap">
-        <img src="./screenshots/screenshot_3.png" alt="Theme detail — root cause and content opportunity" />
-        <div class="screenshot-caption">Theme detail — root cause and content opportunity</div>
-      </div>
-
-    </div>
-  </section>
 
   <!-- ── FOOTER ── -->
   <footer class="footer">
